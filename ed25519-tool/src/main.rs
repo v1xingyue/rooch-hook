@@ -90,6 +90,11 @@ fn main() -> anyhow::Result<()> {
                     println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
+            } else {
+                let hash = Sha256::digest(msg.unwrap()).to_vec();
+                let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
+                println!("Hash: {}", hex::encode(hash));
+                println!("Signature: {}", hex::encode(signature.to_bytes()));
             }
         }
         None => {
