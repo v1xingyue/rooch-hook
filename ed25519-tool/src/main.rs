@@ -1,3 +1,4 @@
+use ed25519_dalek::VerifyingKey;
 use sha2::{Digest, Sha256};
 use {
     anyhow,
@@ -16,6 +17,7 @@ pub struct MyConfig {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Main {
     pub secret_key: String,
+    pub public_key: String,
 }
 
 #[derive(Parser)]
@@ -56,9 +58,12 @@ fn main() -> anyhow::Result<()> {
             let mut csprng = OsRng;
             let signing_key: SigningKey = SigningKey::generate(&mut csprng);
             let secretkey_str = hex::encode(signing_key.to_bytes());
+            let verifying_key: VerifyingKey = VerifyingKey::from(&signing_key);
+            let publickey_str = hex::encode(verifying_key.to_bytes());
             let m = MyConfig {
                 main: Main {
                     secret_key: secretkey_str,
+                    public_key: publickey_str,
                 },
             };
 
