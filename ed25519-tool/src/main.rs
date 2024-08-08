@@ -84,14 +84,14 @@ fn main() -> anyhow::Result<()> {
                 if file.is_none() {
                     println!("No file or msg specified");
                 } else {
-                    let file_content = fs::read(file.unwrap())?;
-                    let hash = Sha256::digest(file_content).to_vec();
+                    let file_content = fs::read_to_string(file.unwrap())?;
+                    let hash = Sha256::digest(file_content.trim()).to_vec();
                     let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
                     println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             } else {
-                let hash = Sha256::digest(msg.unwrap()).to_vec();
+                let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
                 let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
                 println!("Hash: {}", hex::encode(hash));
                 println!("Signature: {}", hex::encode(signature.to_bytes()));
