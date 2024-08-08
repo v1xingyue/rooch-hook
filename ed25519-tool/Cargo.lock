@@ -265,6 +265,7 @@ dependencies = [
  "hex",
  "rand",
  "serde",
+ "sha2",
  "toml",
 ]
 

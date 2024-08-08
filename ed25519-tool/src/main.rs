@@ -1,3 +1,4 @@
+use sha2::{Digest, Sha256};
 use {
     anyhow,
     clap::{Parser, Subcommand},
@@ -83,9 +84,10 @@ fn main() -> anyhow::Result<()> {
                 if file.is_none() {
                     println!("No file or msg specified");
                 } else {
-                    let file_content = fs::read_to_string(file.unwrap())?;
-                    let file_bytes = file_content.as_bytes();
-                    let signature: ed25519_dalek::Signature = key_pair.sign(file_bytes);
+                    let file_content = fs::read(file.unwrap())?;
+                    let hash = Sha256::digest(file_content).to_vec();
+                    let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
+                    println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             }
