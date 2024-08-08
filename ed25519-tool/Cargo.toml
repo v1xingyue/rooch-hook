@@ -1,0 +1,14 @@
+[package]
+name = "ed25519-tool"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+dirs = "5.0.1"
+ed25519-dalek = {features=["rand_core"],version="2.1.1"}
+hex = "0.4.3"
+rand = "0.8.5"
+serde = { version = "1.0.203", features = ["derive"] }
+toml = "0.8.14"
+clap = { version = "4.5.7", features = ["derive","help"] }
