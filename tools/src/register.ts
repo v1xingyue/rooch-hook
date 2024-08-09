@@ -104,12 +104,12 @@ const main = async () => {
     args: [
       Args.string("https://github.com/v1xingyue/rooch-hook.git"),
       Args.string("https://github.com/v1xingyue/rooch-hook.git"),
-      Args.string("hello this is one commit"),
+      Args.string("submit commit with verify"),
       Args.string(
-        "caeebcb3e95304d9655ad73573714bc9259302fc4f1327519d53b494b297218f59adde389c8a154661518720b316a7e2f4a46b9df32a004b669deff87372ca05"
+        "5a9b394595884c00b93507da165306aa4cfc2107fddaa0afe6a708ecb24d429293beeb8054f141997312ddc1cfc4125f5292ee7dad40cf730a8d9ef9329e560d"
       ),
       Args.string(
-        "348ecf10b46c5d71ffe6b34c0c388e937924aa649a19235d30d57a42eb7be8ef"
+        "46d3e93ebfd3ee87ebeae589fe22df3a938fd34b619519f9a3480c5445629f33"
       ),
     ],
   });
