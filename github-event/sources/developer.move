@@ -16,19 +16,25 @@ module github_event::developer {
 
     struct DeveloperInfo has key {
         name: String,
-        signer_pub: vector<u8>,
+        signer_pub: String,
         commits: table_vec::TableVec<Commit>,
     }
 
-    entry fun mint(signer:&signer,name:String,signer_pub_str:String){
-        account::move_resource_to(signer, DeveloperInfo { name,signer_pub:into_bytes(signer_pub_str),commits: table_vec::new()});
+    entry fun mint(signer:&signer,name:String,signer_pub:String){
+        account::move_resource_to(signer, DeveloperInfo { name,signer_pub,commits: table_vec::new()});
     }
     
-    //     native public fun verify(signature: &vector<u8>, public_key: &vector<u8>, msg: &vector<u8>): bool;
-    entry fun commit(signer:&signer,repo_url:String,commit_url:String,message:String,signature:vector<u8>,msg:vector<u8>){
-        let commit_time = timestamp::now_seconds();
+    // native public fun verify(signature: &vector<u8>, public_key: &vector<u8>, msg: &vector<u8>): bool;
+    entry fun commit(signer:&signer,repo_url:String,commit_url:String,message:String,signature:String,msg_hash:String){
         let  dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
+        // ed25519::verify(&signature,&into_bytes(dev_info.signer_pub),&msg_hash);
+        let commit_time = timestamp::now_seconds();
         table_vec::push_back(&mut dev_info.commits, Commit { commit_time,message,repo_url,commit_url});
+    }
+
+    // view
+    public fun verify_by_address(addres: address,signature: String, msg_hash: String): bool {
+        true
     }
 
 }

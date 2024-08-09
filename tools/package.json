@@ -1,0 +1,21 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node src/register.ts",
+    "test-all": "mocha --require ts-node/register test/*/*.test.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.1.0",
+    "mocha": "^10.7.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4"
+  }
+}
