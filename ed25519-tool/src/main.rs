@@ -89,7 +89,6 @@ fn main() -> anyhow::Result<()> {
                     public_key: publickey_str,
                 },
             };
-
             let config = toml::to_string(&m)?;
             std::fs::write(config_path, config)?;
             signing_key
@@ -105,6 +104,8 @@ fn main() -> anyhow::Result<()> {
         }
     };
 
+    debug!("public_key : {:?}", key_pair.verifying_key().to_bytes());
+
     match cli.command {
         Some(Command::Sign { file, msg }) => {
             if msg.is_none() {
@@ -113,7 +114,7 @@ fn main() -> anyhow::Result<()> {
                 } else {
                     let file_content = fs::read_to_string(file.unwrap())?;
                     let hash = Sha256::digest(file_content.trim()).to_vec();
-                    let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
+                    let signature = key_pair.sign(&hash);
                     println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
