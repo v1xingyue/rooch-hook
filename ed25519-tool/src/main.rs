@@ -113,21 +113,25 @@ fn main() -> anyhow::Result<()> {
                     error!("No file or msg specified");
                 } else {
                     let file_content = fs::read_to_string(file.unwrap())?;
+                    debug!("file content: {}", file_content);
                     let hash = Sha256::digest(file_content.trim()).to_vec();
                     let signature = key_pair.sign(&hash);
-                    println!("Hash: {}", hex::encode(hash));
+                    println!("Hash (sha256) : {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             } else {
+                debug!("sign as msg mode...");
                 let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
                 let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
-                println!("Hash: {}", hex::encode(hash));
+                println!("Hash(sha256): {}", hex::encode(hash));
                 println!("Signature: {}", hex::encode(signature.to_bytes()));
             }
         }
         Some(Command::Verify { msg, signature }) => {
             let verifying_key: VerifyingKey = VerifyingKey::from(&key_pair);
+            debug!("verifying_key: {:?}", &verifying_key);
             let msg_bytes = hex::decode(msg)?;
+            debug!("msg bytes: {:?}", &msg_bytes);
             let signature_bytes = hex::decode(signature)?;
             let s = SignatureBytes::try_from(signature_bytes).unwrap();
             let signature = Signature::from_bytes(&s);
@@ -143,24 +147,6 @@ fn main() -> anyhow::Result<()> {
             std::process::exit(1);
         }
     }
-
-    // let verifying_key: VerifyingKey = VerifyingKey::from(&key_pair);
-    // let private_key = key_pair.to_bytes();
-    // let public_key = verifying_key.to_bytes();
-
-    // println!("Private Key: {}", hex::encode(private_key));
-    // println!("Public Key: {}", hex::encode(public_key));
-    // println!("public key bytes : {:?}", &public_key);
-
-    // let message = b"Hello, world!";
-    // let signature = key_pair.sign(message);
-    // println!("Signature: {}", hex::encode(signature.to_bytes()));
-
-    // let verified = verifying_key.verify_strict(message, &signature);
-    // match verified {
-    //     Ok(_) => println!("Signature is valid"),
-    //     Err(_) => println!("Signature is invalid"),
-    // }
 
     Ok(())
 }
