@@ -87,15 +87,39 @@ const main = async () => {
     args: [
       Args.address(pair.getRoochAddress().toStr()),
       Args.string(
-        "cd49245b49df24fa37a33e4a46b5720445d0c121b85dbfec795e0944d3ac9ec72dbd57d2ba400717011f818b5d040bd7696e3a447bf5965fb3c81f21a573f807"
+        "caeebcb3e95304d9655ad73573714bc9259302fc4f1327519d53b494b297218f59adde389c8a154661518720b316a7e2f4a46b9df32a004b669deff87372ca04"
       ),
       Args.string(
-        "0acf638c029402d456b245edb834562ef60b3a7bf9abf647a06a01bc947d3ce1"
+        "348ecf10b46c5d71ffe6b34c0c388e937924aa649a19235d30d57a42eb7be8ef"
       ),
     ],
   });
 
   console.log(verified);
+
+  let my_commit = new Transaction();
+
+  my_commit.callFunction({
+    target: `${package_address}::developer::commit`,
+    args: [
+      Args.string("https://github.com/v1xingyue/rooch-hook.git"),
+      Args.string("https://github.com/v1xingyue/rooch-hook.git"),
+      Args.string("hello this is one commit"),
+      Args.string(
+        "caeebcb3e95304d9655ad73573714bc9259302fc4f1327519d53b494b297218f59adde389c8a154661518720b316a7e2f4a46b9df32a004b669deff87372ca05"
+      ),
+      Args.string(
+        "348ecf10b46c5d71ffe6b34c0c388e937924aa649a19235d30d57a42eb7be8ef"
+      ),
+    ],
+  });
+
+  const submit = await client.signAndExecuteTransaction({
+    transaction: my_commit,
+    signer: pair,
+  });
+
+  console.log(submit);
 };
 
 main().then(null).catch(null);

@@ -8,6 +8,9 @@ module github_event::developer {
     use rooch_framework::ed25519;
     use moveos_std::hex;
     
+
+    const E_COMMIT_VERIFY_FAILED: u64 = 1;
+
     struct Commit has store {
         commit_time : u64,
         message: String,
@@ -28,7 +31,8 @@ module github_event::developer {
     // native public fun verify(signature: &vector<u8>, public_key: &vector<u8>, msg: &vector<u8>): bool;
     entry fun commit(signer:&signer,repo_url:String,commit_url:String,message:String,_signature:String,_msg_hash:String){
         let  dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
-        // ed25519::verify(&signature,&into_bytes(dev_info.signer_pub),&msg_hash);
+        let v = verify_by_address(signer::address_of(signer),_signature,_msg_hash);
+        assert!(v, E_COMMIT_VERIFY_FAILED);
         let commit_time = timestamp::now_seconds();
         table_vec::push_back(&mut dev_info.commits, Commit { commit_time,message,repo_url,commit_url});
     }
@@ -38,7 +42,6 @@ module github_event::developer {
         let dev_info = account::borrow_resource<DeveloperInfo>(addr);
         dev_info.name
     }
-
 
     // view
     public fun user_pub(addr: address): vector<u8> {
