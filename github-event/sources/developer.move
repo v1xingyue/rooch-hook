@@ -1,6 +1,6 @@
 module github_event::developer {
 
-    use std::string::{String,into_bytes,Self};
+    use std::string::{String,into_bytes};
     use moveos_std::account;
     use moveos_std::table_vec;
     use moveos_std::signer;
@@ -62,6 +62,13 @@ module github_event::developer {
     }
 
     // view
+    public fun verify_by_address_x(addr: address,signature_bytes: vector<u8>, msg_bytes: vector<u8>): bool {
+        let dev_info = account::borrow_resource<DeveloperInfo>(addr);
+        let pub_key = dev_info.signer_pub;
+        ed25519::verify(&signature_bytes,&pub_key,&msg_bytes)
+    }
+
+    // view
     public fun test_verify(): u8{
         
         // let a = b"0x6382c729be8d6c0b4306d88037b4658bcb31f5f33f50230da6b925c1b8dd5719";
@@ -82,9 +89,9 @@ module github_event::developer {
         if(!ed25519::verify(&sig, &pk, &msg)) {
             0
         } else {
-            let msg_x = x"ade7b4747057fa39d07d6cf76de81940a63cd759725f659a63eb5fc546972549";
+            let msg_x = x"0acf638c029402d456b245edb834562ef60b3a7bf9abf647a06a01bc947d3ce1";
             let pk_x = x"6382c729be8d6c0b4306d88037b4658bcb31f5f33f50230da6b925c1b8dd5719";
-            let sig_x = x"cd0c7be6e09ded6c1086da3afeb34172b9b4262edb68c9d9ec49d644a52e6b9462b3ce863a1cb035341409e86bfed97d0326f85d00d7f8517e686149f2d7cc07";
+            let sig_x = x"cd49245b49df24fa37a33e4a46b5720445d0c121b85dbfec795e0944d3ac9ec72dbd57d2ba400717011f818b5d040bd7696e3a447bf5965fb3c81f21a573f807";
 
             if(ed25519::verify(&sig_x, &pk_x, &msg_x)){
                 1
