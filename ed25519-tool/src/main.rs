@@ -1,11 +1,15 @@
-use ed25519_dalek::VerifyingKey;
-use sha2::{Digest, Sha256};
 use {
     anyhow,
     clap::{Parser, Subcommand},
-    ed25519_dalek::{ed25519::signature::SignerMut, SigningKey},
+    ed25519_dalek::{
+        ed25519::{signature::SignerMut, SignatureBytes},
+        Signature, SigningKey, VerifyingKey,
+    },
+    env_logger::{self, Env},
+    log::{debug, error, info},
     rand::rngs::OsRng,
     serde::{Deserialize, Serialize},
+    sha2::{Digest, Sha256},
     std::fs,
 };
 
@@ -26,6 +30,10 @@ pub struct Cli {
     /// Optional name to operate on
     pub name: Option<String>,
 
+    /// Optional debug mode
+    #[arg(short, long, default_value_t = false)]
+    pub debug: bool,
+
     #[command(subcommand)]
     pub command: Option<Command>,
 }
@@ -42,16 +50,31 @@ pub enum Command {
         #[arg(short, long)]
         msg: Option<String>,
     },
+
+    /// verify ed25519 signature
+    Verify {
+        /// message used to sign , msg should be hexed bytes
+        #[arg(short, long)]
+        msg: String,
+
+        /// signature to verify , signature should be hexed bytes
+        #[arg(short, long)]
+        signature: String,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
+    let cli = Cli::parse();
+    let default_level = if cli.debug { "debug" } else { "info" };
+    env_logger::Builder::from_env(Env::default().default_filter_or(default_level)).init();
+
     let home_path = dirs::home_dir();
     if home_path.is_none() {
         return Err(anyhow::anyhow!("Failed to get home directory"));
     }
 
     let config_path = home_path.unwrap().join(".ed25519-tool.toml");
-    // println!("config path: {}", config_path.to_str().unwrap());
+    debug!("config path: {}", config_path.to_str().unwrap());
 
     let mut key_pair = {
         if !config_path.exists() {
@@ -82,12 +105,11 @@ fn main() -> anyhow::Result<()> {
         }
     };
 
-    let cli = Cli::parse();
     match cli.command {
         Some(Command::Sign { file, msg }) => {
             if msg.is_none() {
                 if file.is_none() {
-                    println!("No file or msg specified");
+                    error!("No file or msg specified");
                 } else {
                     let file_content = fs::read_to_string(file.unwrap())?;
                     let hash = Sha256::digest(file_content.trim()).to_vec();
@@ -102,8 +124,22 @@ fn main() -> anyhow::Result<()> {
                 println!("Signature: {}", hex::encode(signature.to_bytes()));
             }
         }
+        Some(Command::Verify { msg, signature }) => {
+            let verifying_key: VerifyingKey = VerifyingKey::from(&key_pair);
+            let msg_bytes = hex::decode(msg)?;
+            let signature_bytes = hex::decode(signature)?;
+            let s = SignatureBytes::try_from(signature_bytes).unwrap();
+            let signature = Signature::from_bytes(&s);
+            let verified = verifying_key.verify_strict(&msg_bytes, &signature);
+            match verified {
+                Ok(_) => info!("Signature is valid"),
+                Err(_) => info!("Signature is invalid"),
+            }
+        }
         None => {
-            println!("No command specified");
+            error!("No command specified");
+            Cli::parse_from(&["ed25519-tool", "--help"]);
+            std::process::exit(1);
         }
     }
 
