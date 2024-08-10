@@ -1,55 +1,51 @@
 import {
-  Args,
   RoochClient,
   Secp256k1Keypair,
-  Transaction,
   getRoochNodeUrl,
-  toHEX,
-  fromHEX,
 } from "@roochnetwork/rooch-sdk";
+import path from "path";
+
+import dotenv from "dotenv";
+dotenv.config({
+  path: path.join(__dirname, "../../.env"),
+});
 
 const main = async () => {
-  const privateKey =
-    "roochsecretkey1q9tpz0s7378ztddva8hs0z8yuj042mq2r02awvthts2q70hzs3p2xpqp2p6";
-
-  const url = getRoochNodeUrl("devnet");
-  console.log(url);
+  const privateKey = process.env.PRIVATE_KEY as string;
+  const url = getRoochNodeUrl(process.env.NETWORK as any);
+  console.log(`rpc url is ${url}`);
 
   const client = new RoochClient({
     url,
   });
 
   const pair = Secp256k1Keypair.fromSecretKey(privateKey);
-  console.log(pair.getRoochAddress().toStr());
+  console.log(`rooch address is ${pair.getRoochAddress().toStr()}`);
   const package_address = pair.getRoochAddress().toHexAddress();
-
-  const balance = await client.getBalance({
-    owner: pair.getRoochAddress().toStr(),
-    coinType: "0x3::gas_coin::GasCoin",
-  });
-  console.log(balance);
+  console.log(`package address is ${package_address}`);
 
   const resource = await client.getStates({
-    accessPath: `/resource/0x28aae6ffa6ec731f1c5bab813e65f236e8700980d031e1f2bbaaa54285421ed3/0x28aae6ffa6ec731f1c5bab813e65f236e8700980d031e1f2bbaaa54285421ed3::developer::DeveloperInfo`,
+    accessPath: `/resource/${package_address}/${package_address}::developer::DeveloperInfo`,
     stateOption: {
       decode: true,
     },
   });
 
-  const v = resource[0].decoded_value?.value.value as any;
-  let table_id = v.value.commits.value.contents.value.handle.value.id;
-
-  console.log(`commits table id is ${table_id}`);
-
-  const commits = await client.listStates({
-    accessPath: `/table/${table_id}`,
-    stateOption: {
-      decode: true,
-      showDisplay: false,
-    },
-  });
-
-  console.log(JSON.stringify(commits, null, 2));
+  if (resource.length === 0) {
+    console.log(`no resource found`);
+  } else {
+    const v = resource[0].decoded_value?.value.value as any;
+    let table_id = v.value.commits.value.contents.value.handle.value.id;
+    console.log(`commits table id is ${table_id}`);
+    const commits = await client.listStates({
+      accessPath: `/table/${table_id}`,
+      stateOption: {
+        decode: true,
+        showDisplay: false,
+      },
+    });
+    console.log(JSON.stringify(commits, null, 2));
+  }
 };
 
 main().then(null).catch(null);

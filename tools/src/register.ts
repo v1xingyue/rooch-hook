@@ -7,27 +7,31 @@ import {
   toHEX,
   fromHEX,
 } from "@roochnetwork/rooch-sdk";
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config({
+  path: path.join(__dirname, "../../.env"),
+});
 
 const main = async () => {
-  const privateKey =
-    "roochsecretkey1q9tpz0s7378ztddva8hs0z8yuj042mq2r02awvthts2q70hzs3p2xpqp2p6";
-
-  const url = getRoochNodeUrl("devnet");
-  console.log(url);
+  const privateKey = process.env.PRIVATE_KEY as string;
+  const url = getRoochNodeUrl(process.env.NETWORK as any);
+  console.log(`rpc url is ${url}`);
 
   const client = new RoochClient({
     url,
   });
 
   const pair = Secp256k1Keypair.fromSecretKey(privateKey);
-  console.log(pair.getRoochAddress().toStr());
+  console.log(`rooch address is ${pair.getRoochAddress().toStr()}`);
   const package_address = pair.getRoochAddress().toHexAddress();
+  console.log(`package address is ${package_address}`);
 
   const balance = await client.getBalance({
     owner: pair.getRoochAddress().toStr(),
     coinType: "0x3::gas_coin::GasCoin",
   });
-  console.log(balance);
+  console.log(`current balance is ${balance} `);
 
   const tx = new Transaction();
   tx.callFunction({

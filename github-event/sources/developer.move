@@ -8,7 +8,6 @@ module github_event::developer {
     use rooch_framework::ed25519;
     use moveos_std::hex;
     
-
     const E_COMMIT_VERIFY_FAILED: u64 = 1;
 
     struct Commit has store {
