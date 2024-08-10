@@ -1,6 +1,6 @@
 # rooch-hook
 
-1. install ed25519-tool
+1. install ed25519-tool.
 
 ```shell
 cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch main
