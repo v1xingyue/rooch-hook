@@ -29,6 +29,7 @@ export const POST = async (req: Request) => {
     const commit_url = commit.url;
     const raw_message = commit.message as string;
     const parsed = parseCommitMessge(raw_message);
+    const commit_user = commit.committer.username;
 
     const pair = Secp256k1Keypair.fromSecretKey(process.env.PRIVATE_KEY!);
     const packageAddress = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -46,6 +47,7 @@ export const POST = async (req: Request) => {
         Args.string(repo_url),
         Args.string(commit_url),
         Args.string(parsed.messageBody),
+        Args.string(commit_user),
         Args.string(parsed.msg_signate),
         Args.string(parsed.msg_hash),
       ],
