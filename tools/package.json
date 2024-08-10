@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "mint": "ts-node src/mint.ts",
     "test": "ts-node src/register.ts",
     "items": "ts-node src/items.ts",
     "test-all": "mocha --require ts-node/register test/*/*.test.ts"
