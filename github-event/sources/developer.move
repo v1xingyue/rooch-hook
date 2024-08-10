@@ -14,7 +14,8 @@ module github_event::developer {
         commit_time : u64,
         message: String,
         repo_url: String,
-        commit_url: String
+        commit_url: String,
+        commit_user : String,
     }
 
     struct DeveloperInfo has key {
@@ -27,12 +28,12 @@ module github_event::developer {
         account::move_resource_to(signer, DeveloperInfo { name,signer_pub,commits: table_vec::new()});
     }
     
-    entry fun commit(signer:&signer,repo_url:String,commit_url:String,message:String,_signature:String,_msg_hash:String){
+    entry fun commit(signer:&signer,repo_url:String,commit_url:String,message:String,commit_user:String,_signature:String,_msg_hash:String){
         let  dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
         let v = verify_by_address(signer::address_of(signer),_signature,_msg_hash);
         assert!(v, E_COMMIT_VERIFY_FAILED);
         let commit_time = timestamp::now_seconds();
-        table_vec::push_back(&mut dev_info.commits, Commit { commit_time,message,repo_url,commit_url});
+        table_vec::push_back(&mut dev_info.commits, Commit { commit_time,message,repo_url,commit_url,commit_user});
     }
 
     // view
