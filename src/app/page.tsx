@@ -66,6 +66,12 @@ export default function Home() {
       <div>
         <p>Table ID : {tableId}</p>
         <table>
+          <tr>
+            <td>Commit time </td>
+            <td>Commit url </td>
+            <td>Commit message </td>
+            <td>Commit repo_url </td>
+          </tr>
           {commits.map((commit) => {
             let decode_value = commit.state.decoded_value.value.value.value;
             return (
