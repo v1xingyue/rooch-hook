@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { getRoochNodeUrl, RoochClient } from "@roochnetwork/rooch-sdk";
 import "./page.css";
+import { useQuery } from "@tanstack/react-query";
 
-export default function Home() {
-  const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
-  const network = process.env.NEXT_PUBLIC_NETWORK;
-
-  const [tableId, setTableId] = useState("");
-  const [commits, setCommits] = useState<any[]>([]);
-
-  useEffect(() => {
-    const loadCommits = async () => {
+const useDeveloperInfo = (network: any, mypackage: string) => {
+  return useQuery({
+    queryKey: ["developer_info", mypackage, network],
+    queryFn: async () => {
       const client = new RoochClient({
         url: getRoochNodeUrl(network as any),
       });
@@ -25,21 +20,25 @@ export default function Home() {
       });
 
       console.log(resource);
-
       if (resource.length > 0) {
         const v = resource[0].decoded_value?.value.value as any;
         let table_id = v.value.commits.value.contents.value.handle.value
           .id as string;
-        setTableId(table_id);
+        return table_id;
       } else {
         console.log("No resource found");
+        throw new Error("No resource found");
       }
-    };
-    loadCommits();
-  }, [mypackage, network]);
+    },
+    enabled: !!mypackage && !!network,
+    refetchInterval: 10000,
+  });
+};
 
-  useEffect(() => {
-    const loadCommits = async () => {
+const useCommits = (network: any, tableId: string | undefined) => {
+  return useQuery({
+    queryKey: ["commits", tableId, network],
+    queryFn: async () => {
       if (tableId) {
         const client = new RoochClient({
           url: getRoochNodeUrl(network as any),
@@ -51,12 +50,30 @@ export default function Home() {
             showDisplay: false,
           },
         });
-        console.log(JSON.stringify(commits.data, null, 2));
-        setCommits(commits.data as any[]);
+        return commits.data as any[];
+      } else {
+        return [];
       }
-    };
-    loadCommits();
-  }, [tableId, network]);
+    },
+    enabled: !!tableId && !!network,
+    refetchInterval: 10000,
+  });
+};
+
+export default function Home() {
+  const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
+  const network = process.env.NEXT_PUBLIC_NETWORK;
+  const {
+    data: tableId,
+    isLoading: isLoadingTableId,
+    error: tableIdError,
+  } = useDeveloperInfo(network, mypackage as string);
+
+  const {
+    data: commits,
+    isLoading: isLoadingCommits,
+    error: commitsError,
+  } = useCommits(network, tableId);
 
   return (
     <main className="main">
@@ -73,18 +90,19 @@ export default function Home() {
             <td>Commit repo_url </td>
             <td>Commit username </td>
           </tr>
-          {commits.map((commit) => {
-            let decode_value = commit.state.decoded_value.value.value.value;
-            return (
-              <tr key={commit.field_key}>
-                <td>{decode_value.commit_time}</td>
-                <td>{decode_value.commit_url}</td>
-                <td>{decode_value.message}</td>
-                <td>{decode_value.repo_url}</td>
-                <td>{decode_value.commit_user}</td>
-              </tr>
-            );
-          })}
+          {commits &&
+            commits.map((commit) => {
+              let decode_value = commit.state.decoded_value.value.value.value;
+              return (
+                <tr key={commit.field_key}>
+                  <td>{decode_value.commit_time}</td>
+                  <td>{decode_value.commit_url}</td>
+                  <td>{decode_value.message}</td>
+                  <td>{decode_value.repo_url}</td>
+                  <td>{decode_value.commit_user}</td>
+                </tr>
+              );
+            })}
         </table>
       </div>
     </main>
