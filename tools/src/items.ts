@@ -12,7 +12,7 @@ dotenv.config({
 
 const main = async () => {
   const privateKey = process.env.PRIVATE_KEY as string;
-  const url = getRoochNodeUrl(process.env.NETWORK as any);
+  const url = getRoochNodeUrl(process.env.NEXT_PUBLIC_NETWORK as any);
   console.log(`rpc url is ${url}`);
 
   const client = new RoochClient({
