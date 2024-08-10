@@ -31,7 +31,7 @@ export const POST = async (req: Request) => {
     const parsed = parseCommitMessge(raw_message);
 
     const pair = Secp256k1Keypair.fromSecretKey(process.env.PRIVATE_KEY!);
-    const packageAddress = pair.getRoochAddress().toHexAddress();
+    const packageAddress = process.env.PACKAGE_ADDRESS;
     const url = getRoochNodeUrl(process.env.NETWORK as any);
     console.log(`rpc url is ${url}`);
 
