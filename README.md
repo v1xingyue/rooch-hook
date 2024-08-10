@@ -6,6 +6,19 @@
 cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch main
 ```
 
+put your hook content to **.git/hooks/prepare-commit-msg**:
+
+```shell
+#!/bin/bash
+
+COMMIT_MSG_FILE=$1
+CUSTOM_SIGNATURE=$(ed25519-tool sign -f $COMMIT_MSG_FILE)
+
+# Append the custom signature to the commit message
+echo -e "\n$CUSTOM_SIGNATURE" >> "$COMMIT_MSG_FILE"
+
+```
+
 2. deploy contract
 
 ```shell
