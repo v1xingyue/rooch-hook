@@ -22,6 +22,7 @@ pub struct MyConfig {
 pub struct Main {
     pub secret_key: String,
     pub public_key: String,
+    pub address: String,
 }
 
 #[derive(Parser)]
@@ -29,6 +30,10 @@ pub struct Main {
 pub struct Cli {
     /// Optional name to operate on
     pub name: Option<String>,
+
+    /// hashtype you will used
+    #[arg(short, long, default_value = "sha256")]
+    hash_type: String,
 
     /// Optional debug mode
     #[arg(short, long, default_value_t = false)]
@@ -68,6 +73,16 @@ fn main() -> anyhow::Result<()> {
     let default_level = if cli.debug { "debug" } else { "info" };
     env_logger::Builder::from_env(Env::default().default_filter_or(default_level)).init();
 
+    let mut hasher = {
+        match cli.hash_type.as_str() {
+            "sha256" => Sha256::new(),
+            _ => {
+                error!("Unsupported hash type: {}", cli.hash_type);
+                std::process::exit(1);
+            }
+        }
+    };
+
     let home_path = dirs::home_dir();
     if home_path.is_none() {
         return Err(anyhow::anyhow!("Failed to get home directory"));
@@ -76,7 +91,7 @@ fn main() -> anyhow::Result<()> {
     let config_path = home_path.unwrap().join(".ed25519-tool.toml");
     debug!("config path: {}", config_path.to_str().unwrap());
 
-    let mut key_pair = {
+    let (mut key_pair, myconfig) = {
         if !config_path.exists() {
             let mut csprng = OsRng;
             let signing_key: SigningKey = SigningKey::generate(&mut csprng);
@@ -87,20 +102,21 @@ fn main() -> anyhow::Result<()> {
                 main: Main {
                     secret_key: secretkey_str,
                     public_key: publickey_str,
+                    address: "".to_string(),
                 },
             };
             let config = toml::to_string(&m)?;
             std::fs::write(config_path, config)?;
-            signing_key
+            (signing_key, m)
         } else {
             let config_content = fs::read_to_string(config_path)?;
             let config: MyConfig = toml::from_str(&config_content)?;
-            let key_bytes = hex::decode(config.main.secret_key).unwrap();
+            let key_bytes = hex::decode(&config.main.secret_key).unwrap();
             let key_array: [u8; 32] = key_bytes
                 .try_into()
                 .expect("secret_key must be 32 bytes long");
             let signing_key = SigningKey::from_bytes(&key_array);
-            signing_key
+            (signing_key, config)
         }
     };
 
@@ -114,15 +130,27 @@ fn main() -> anyhow::Result<()> {
                 } else {
                     let file_content = fs::read_to_string(file.unwrap())?;
                     debug!("file content: {}", file_content);
-                    let hash = Sha256::digest(file_content.trim()).to_vec();
+                    hasher.update(file_content.trim());
+                    if !myconfig.main.address.is_empty() {
+                        hasher.update(myconfig.main.address.trim())
+                    }
+                    let hash = hasher.finalize();
                     let signature = key_pair.sign(&hash);
+                    if !myconfig.main.address.is_empty() {
+                        println!("Address: {}", myconfig.main.address);
+                    }
                     println!("Hash (sha256) : {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             } else {
                 debug!("sign as msg mode...");
-                let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
+                // let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
+                hasher.update(msg.unwrap().trim());
+                let hash = hasher.finalize();
                 let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
+                if !myconfig.main.address.is_empty() {
+                    println!("Address: {}", myconfig.main.address);
+                }
                 println!("Hash(sha256): {}", hex::encode(hash));
                 println!("Signature: {}", hex::encode(signature.to_bytes()));
             }
