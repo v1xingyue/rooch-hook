@@ -12,13 +12,24 @@ const parseCommitMessge = (msg: string) => {
   let parts = msg.split("\n\n");
   let messageBody = parts[0];
   let sign_parts = parts[1].split("\n");
-  let msg_hash = String(sign_parts[0]).substring(16);
-  let msg_signate = String(sign_parts[1]).substring(11);
-  return {
-    messageBody,
-    msg_hash,
-    msg_signate,
-  };
+  if (sign_parts.length == 2) {
+    let msg_hash = String(sign_parts[0]).substring(16);
+    let msg_signate = String(sign_parts[1]).substring(11);
+    return {
+      messageBody,
+      msg_hash,
+      msg_signate,
+    };
+  } else {
+    let count = sign_parts.length;
+    let msg_hash = String(sign_parts[count - 2]).substring(16);
+    let msg_signate = String(sign_parts[count - 1]).substring(11);
+    return {
+      messageBody,
+      msg_hash,
+      msg_signate,
+    };
+  }
 };
 
 export const POST = async (req: Request) => {
