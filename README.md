@@ -57,3 +57,5 @@ Subscribe your github repo webhook to our public hooks. It will help bring your 
 - rooch move view --function default::developer::user_pub --args address:default
 - rooch move view --function default::developer::user_pub_bytes --args address:default
 - rooch move view --function default::developer::test_verify
+
+...
