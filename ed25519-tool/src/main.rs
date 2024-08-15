@@ -9,7 +9,7 @@ use {
     log::{debug, error, info},
     rand::rngs::OsRng,
     serde::{Deserialize, Serialize},
-    sha2::{Digest, Sha256},
+    sha2::{digest::DynDigest, Digest, Sha256, Sha512},
     std::{fs, path::PathBuf},
 };
 
@@ -31,7 +31,7 @@ pub struct Cli {
     /// Optional name to operate on
     pub name: Option<String>,
 
-    /// hashtype you will used
+    /// hashtype you will used (sha256, sha512)
     #[arg(long, default_value = "sha256")]
     hash_type: Option<String>,
 
@@ -107,9 +107,10 @@ fn main() -> anyhow::Result<()> {
     let default_level = if cli.debug { "debug" } else { "info" };
     env_logger::Builder::from_env(Env::default().default_filter_or(default_level)).init();
 
-    let mut hasher = {
+    let mut hasher: Box<dyn DynDigest> = {
         match cli.hash_type {
-            Some(ref s) if s == "sha256" => Sha256::new(),
+            Some(ref s) if s == "sha256" => Box::new(Sha256::new()),
+            Some(ref s) if s == "sha512" => Box::new(Sha512::new()),
             _ => {
                 error!("Unsupported hash type: {}", cli.hash_type.unwrap());
                 std::process::exit(1);
@@ -125,7 +126,6 @@ fn main() -> anyhow::Result<()> {
             let secretkey_str = hex::encode(signing_key.to_bytes());
             let verifying_key = VerifyingKey::from(&signing_key);
             let publickey_str = hex::encode(verifying_key.to_bytes());
-
             info!(
                 "verifying_key key: {}",
                 hex::encode(verifying_key.to_bytes())
@@ -154,9 +154,9 @@ fn main() -> anyhow::Result<()> {
                 } else {
                     let file_content = fs::read_to_string(file.unwrap())?;
                     debug!("file content: {}", file_content);
-                    hasher.update(file_content.trim());
+                    hasher.update(file_content.trim().as_bytes());
                     if !myconfig.main.address.is_empty() {
-                        hasher.update(myconfig.main.address.trim())
+                        hasher.update(myconfig.main.address.trim().as_bytes())
                     }
                     let hash = hasher.finalize();
                     let signature = key_pair.sign(&hash);
@@ -169,7 +169,7 @@ fn main() -> anyhow::Result<()> {
             } else {
                 debug!("sign as msg mode...");
                 // let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
-                hasher.update(msg.unwrap().trim());
+                hasher.update(msg.unwrap().trim().as_bytes());
                 let hash = hasher.finalize();
                 let signature: ed25519_dalek::Signature = key_pair.sign(&hash);
                 if !myconfig.main.address.is_empty() {
