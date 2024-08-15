@@ -3,17 +3,20 @@ module github_event::developer {
     use std::string::{String,into_bytes};
     use moveos_std::account;
     use moveos_std::table_vec;
+    use moveos_std::table;
     use moveos_std::signer;
     use moveos_std::timestamp;
     use rooch_framework::ed25519;
     use moveos_std::hex;
     
-    const E_COMMIT_VERIFY_FAILED: u64 = 1;
+    const E_REPO_EXIST : u64 = 1;
+    const E_REPO_NOT_EXIST : u64 = 2;
+    const E_COMMIT_VERIFY_FAILED: u64 = 3;
+    const E_HOOK_NOT_REPO_OWNER: u64 = 4;
 
     struct Commit has store {
         commit_time : u64,
         message: String,
-        repo_url: String,
         commit_url: String,
         commit_user : String,
     }
@@ -21,19 +24,42 @@ module github_event::developer {
     struct DeveloperInfo has key {
         name: String,
         signer_pub: vector<u8>,
+    }
+
+    struct Repo has store {
+        owner: address,
+        repo_name: String,
         commits: table_vec::TableVec<Commit>,
     }
 
-    entry fun mint(signer:&signer,name:String,signer_pub:vector<u8>){
-        account::move_resource_to(signer, DeveloperInfo { name,signer_pub,commits: table_vec::new()});
+    struct Repos has key { 
+        repos: table::Table<String,Repo>
+    }
+
+    fun init(){
+        let signer = moveos_std::signer::module_signer<Repos>();
+        account::move_resource_to(&signer, Repos { repos: table::new() });
+    }
+
+    entry fun mint_developer(signer:&signer,name:String,signer_pub:vector<u8>){
+        account::move_resource_to(signer, DeveloperInfo { name,signer_pub});
+    }
+
+    entry fun create_repo(signer:&signer,repo_url:String,repo_name:String){
+        let repos = account::borrow_mut_resource<Repos>(@github_event); 
+        assert!(!table::contains(&repos.repos, repo_url), E_REPO_EXIST);
+        table::add(&mut repos.repos, repo_url, Repo { owner: signer::address_of(signer), repo_name, commits: table_vec::new() });
     }
     
-    entry fun commit(signer:&signer,repo_url:String,commit_url:String,message:String,commit_user:String,_signature:String,_msg_hash:String){
-        let  dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
-        let v = verify_by_address(signer::address_of(signer),_signature,_msg_hash);
-        assert!(v, E_COMMIT_VERIFY_FAILED);
+    // only can be called by repo hook with his signer pub
+    entry fun commit(signer:&signer,commit_address: address,repo_url:String,commit_url:String,message:String,commit_user:String,_signature:String,_msg_hash:String){
+        assert!(verify_by_address(commit_address,_signature,_msg_hash), E_COMMIT_VERIFY_FAILED);
         let commit_time = timestamp::now_seconds();
-        table_vec::push_back(&mut dev_info.commits, Commit { commit_time,message,repo_url,commit_url,commit_user});
+        let repos = account::borrow_mut_resource<Repos>(@github_event);
+        assert!(table::contains(&repos.repos, repo_url), E_REPO_NOT_EXIST);
+        let repo = table::borrow_mut(&mut repos.repos, repo_url);
+        assert!(repo.owner == signer::address_of(signer),E_HOOK_NOT_REPO_OWNER);
+        table_vec::push_back(&mut repo.commits, Commit { commit_time,message,commit_url,commit_user});
     }
 
     entry fun update_pub(signer:&signer,signer_pub:vector<u8>){
