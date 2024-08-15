@@ -36,6 +36,11 @@ module github_event::developer {
         table_vec::push_back(&mut dev_info.commits, Commit { commit_time,message,repo_url,commit_url,commit_user});
     }
 
+    entry fun update_pub(signer:&signer,signer_pub:vector<u8>){
+        let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
+        dev_info.signer_pub = signer_pub;
+    }
+
     // view
     public fun user_name(addr: address): String {
         let dev_info = account::borrow_resource<DeveloperInfo>(addr);
