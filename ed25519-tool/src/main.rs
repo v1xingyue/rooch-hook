@@ -10,7 +10,7 @@ use {
     rand::rngs::OsRng,
     serde::{Deserialize, Serialize},
     sha2::{Digest, Sha256},
-    std::fs,
+    std::{fs, path::PathBuf},
 };
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -75,12 +75,16 @@ pub enum Command {
     },
 }
 
-fn load_keypair() -> Result<(ed25519_dalek::SigningKey, MyConfig), anyhow::Error> {
+fn config_path() -> Result<PathBuf> {
     let home_path = dirs::home_dir();
     if home_path.is_none() {
         return Err(anyhow::anyhow!("Failed to get home directory"));
     }
-    let config_path = home_path.unwrap().join(".ed25519-tool.toml");
+    Ok(home_path.unwrap().join(".ed25519-tool.toml"))
+}
+
+fn load_keypair() -> Result<(ed25519_dalek::SigningKey, MyConfig), anyhow::Error> {
+    let config_path = config_path()?;
     debug!("config path: {}", config_path.to_str().unwrap());
     if !config_path.exists() {
         Err(anyhow::anyhow!(
@@ -115,15 +119,11 @@ fn main() -> anyhow::Result<()> {
 
     match cli.command {
         Some(Command::Init { address }) => {
-            let home_path = dirs::home_dir();
-            if home_path.is_none() {
-                return Err(anyhow::anyhow!("Failed to get home directory"));
-            }
-            let config_path = home_path.unwrap().join(".ed25519-tool.toml");
+            let config_path = config_path()?;
             let mut csprng = OsRng;
-            let signing_key: SigningKey = SigningKey::generate(&mut csprng);
+            let signing_key = SigningKey::generate(&mut csprng);
             let secretkey_str = hex::encode(signing_key.to_bytes());
-            let verifying_key: VerifyingKey = VerifyingKey::from(&signing_key);
+            let verifying_key = VerifyingKey::from(&signing_key);
             let publickey_str = hex::encode(verifying_key.to_bytes());
 
             info!(
@@ -142,7 +142,6 @@ fn main() -> anyhow::Result<()> {
             let config = toml::to_string(&m)?;
             info!("write config to : {}", config_path.to_str().unwrap());
             std::fs::write(config_path, config)?;
-
             info!("Successfully initialized");
         }
 
