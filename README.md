@@ -5,7 +5,7 @@
 ### 1. install ed25519-tool
 
 ```shell
-cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch main
+cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch  main
 ```
 
 put your hook content to **.git/hooks/prepare-commit-msg**:
