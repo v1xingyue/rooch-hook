@@ -1,5 +1,5 @@
 use {
-    anyhow,
+    anyhow::{self, Result},
     clap::{Parser, Subcommand},
     ed25519_dalek::{
         ed25519::{signature::SignerMut, SignatureBytes},
@@ -32,8 +32,8 @@ pub struct Cli {
     pub name: Option<String>,
 
     /// hashtype you will used
-    #[arg(short, long, default_value = "sha256")]
-    hash_type: String,
+    #[arg(long, default_value = "sha256")]
+    hash_type: Option<String>,
 
     /// Optional debug mode
     #[arg(short, long, default_value_t = false)]
@@ -45,6 +45,13 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
+    /// init ed25519 keypair
+    Init {
+        /// name of the account
+        #[arg(short, long)]
+        address: String,
+    },
+
     /// sign ed25519 signing
     Sign {
         /// file to sign (calulate sha256 bytes as sign input)
@@ -68,62 +75,80 @@ pub enum Command {
     },
 }
 
+fn load_keypair() -> Result<(ed25519_dalek::SigningKey, MyConfig), anyhow::Error> {
+    let home_path = dirs::home_dir();
+    if home_path.is_none() {
+        return Err(anyhow::anyhow!("Failed to get home directory"));
+    }
+    let config_path = home_path.unwrap().join(".ed25519-tool.toml");
+    debug!("config path: {}", config_path.to_str().unwrap());
+    if !config_path.exists() {
+        Err(anyhow::anyhow!(
+            "Failed to load config file, please run `init` first"
+        ))
+    } else {
+        let config_content = fs::read_to_string(config_path)?;
+        let config: MyConfig = toml::from_str(&config_content)?;
+        let key_bytes = hex::decode(&config.main.secret_key).unwrap();
+        let key_array: [u8; 32] = key_bytes
+            .try_into()
+            .expect("secret_key must be 32 bytes long");
+        let signing_key = SigningKey::from_bytes(&key_array);
+        Ok((signing_key, config))
+    }
+}
+
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let default_level = if cli.debug { "debug" } else { "info" };
     env_logger::Builder::from_env(Env::default().default_filter_or(default_level)).init();
 
     let mut hasher = {
-        match cli.hash_type.as_str() {
-            "sha256" => Sha256::new(),
+        match cli.hash_type {
+            Some(ref s) if s == "sha256" => Sha256::new(),
             _ => {
-                error!("Unsupported hash type: {}", cli.hash_type);
+                error!("Unsupported hash type: {}", cli.hash_type.unwrap());
                 std::process::exit(1);
             }
         }
     };
 
-    let home_path = dirs::home_dir();
-    if home_path.is_none() {
-        return Err(anyhow::anyhow!("Failed to get home directory"));
-    }
-
-    let config_path = home_path.unwrap().join(".ed25519-tool.toml");
-    debug!("config path: {}", config_path.to_str().unwrap());
-
-    let (mut key_pair, myconfig) = {
-        if !config_path.exists() {
+    match cli.command {
+        Some(Command::Init { address }) => {
+            let home_path = dirs::home_dir();
+            if home_path.is_none() {
+                return Err(anyhow::anyhow!("Failed to get home directory"));
+            }
+            let config_path = home_path.unwrap().join(".ed25519-tool.toml");
             let mut csprng = OsRng;
             let signing_key: SigningKey = SigningKey::generate(&mut csprng);
             let secretkey_str = hex::encode(signing_key.to_bytes());
             let verifying_key: VerifyingKey = VerifyingKey::from(&signing_key);
             let publickey_str = hex::encode(verifying_key.to_bytes());
+
+            info!(
+                "verifying_key key: {}",
+                hex::encode(verifying_key.to_bytes())
+            );
+            info!("address is : {}", &address);
+
             let m = MyConfig {
                 main: Main {
                     secret_key: secretkey_str,
                     public_key: publickey_str,
-                    address: "".to_string(),
+                    address,
                 },
             };
             let config = toml::to_string(&m)?;
+            info!("write config to : {}", config_path.to_str().unwrap());
             std::fs::write(config_path, config)?;
-            (signing_key, m)
-        } else {
-            let config_content = fs::read_to_string(config_path)?;
-            let config: MyConfig = toml::from_str(&config_content)?;
-            let key_bytes = hex::decode(&config.main.secret_key).unwrap();
-            let key_array: [u8; 32] = key_bytes
-                .try_into()
-                .expect("secret_key must be 32 bytes long");
-            let signing_key = SigningKey::from_bytes(&key_array);
-            (signing_key, config)
+
+            info!("Successfully initialized");
         }
-    };
 
-    debug!("public_key : {:?}", key_pair.verifying_key().to_bytes());
-
-    match cli.command {
         Some(Command::Sign { file, msg }) => {
+            let (mut key_pair, myconfig) = load_keypair()?;
+            debug!("public_key : {:?}", key_pair.verifying_key().to_bytes());
             if msg.is_none() {
                 if file.is_none() {
                     error!("No file or msg specified");
@@ -156,6 +181,8 @@ fn main() -> anyhow::Result<()> {
             }
         }
         Some(Command::Verify { msg, signature }) => {
+            let (key_pair, _) = load_keypair()?;
+            debug!("public_key : {:?}", key_pair.verifying_key().to_bytes());
             let verifying_key: VerifyingKey = VerifyingKey::from(&key_pair);
             debug!("verifying_key: {:?}", &verifying_key);
             let msg_bytes = hex::decode(msg)?;
