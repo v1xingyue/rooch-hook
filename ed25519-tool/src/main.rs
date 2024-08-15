@@ -8,6 +8,7 @@ use {
     env_logger::{self, Env},
     log::{debug, error, info},
     rand::rngs::OsRng,
+    secp256k1::{Keypair, Secp256k1, SecretKey},
     serde::{Deserialize, Serialize},
     sha2::{digest::DynDigest, Digest, Sha224, Sha256, Sha384, Sha512, Sha512_224, Sha512_256},
     std::{fs, path::PathBuf},
@@ -20,6 +21,7 @@ pub struct MyConfig {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Main {
+    pub key_type: String,
     pub secret_key: String,
     pub public_key: String,
     pub address: String,
@@ -45,8 +47,12 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
-    /// init ed25519 keypair
+    /// init keypair
     Init {
+        /// key type (ed25519,secp256k1)
+        #[arg(long, default_value = "ed25519")]
+        key_type: Option<String>,
+
         /// name of the account
         #[arg(short, long)]
         address: String,
@@ -129,30 +135,66 @@ fn main() -> anyhow::Result<()> {
     };
 
     match cli.command {
-        Some(Command::Init { address }) => {
+        Some(Command::Init { address, key_type }) => {
             let config_path = config_path()?;
-            let mut csprng = OsRng;
-            let signing_key = SigningKey::generate(&mut csprng);
-            let secretkey_str = hex::encode(signing_key.to_bytes());
-            let verifying_key = VerifyingKey::from(&signing_key);
-            let publickey_str = hex::encode(verifying_key.to_bytes());
-            info!(
-                "verifying_key key: {}",
-                hex::encode(verifying_key.to_bytes())
-            );
-            info!("address is : {}", &address);
 
-            let m = MyConfig {
-                main: Main {
-                    secret_key: secretkey_str,
-                    public_key: publickey_str,
-                    address,
-                },
-            };
-            let config = toml::to_string(&m)?;
-            info!("write config to : {}", config_path.to_str().unwrap());
-            std::fs::write(config_path, config)?;
-            info!("Successfully initialized");
+            if config_path.exists() {
+                error!("Config file already exists");
+            } else {
+                match key_type.as_deref() {
+                    Some("ed25519") => {
+                        let signing_key = SigningKey::generate(&mut OsRng);
+                        let secretkey_str = hex::encode(signing_key.to_bytes());
+                        let verifying_key = VerifyingKey::from(&signing_key);
+                        let publickey_str = hex::encode(verifying_key.to_bytes());
+                        info!(
+                            "verifying_key key: {}",
+                            hex::encode(verifying_key.to_bytes())
+                        );
+                        info!("address is : {}", &address);
+
+                        let m = MyConfig {
+                            main: Main {
+                                key_type: key_type.unwrap(),
+                                secret_key: secretkey_str,
+                                public_key: publickey_str,
+                                address,
+                            },
+                        };
+                        let config = toml::to_string(&m)?;
+                        info!("write config to : {}", config_path.to_str().unwrap());
+                        std::fs::write(config_path, config)?;
+                        info!("Successfully initialized");
+                    }
+                    Some("secp256k1") => {
+                        let secp = Secp256k1::new();
+                        let secret_key = SecretKey::new(&mut OsRng);
+                        let key_pair = Keypair::from_secret_key(&secp, &secret_key);
+                        let public_key = key_pair.public_key();
+                        info!("verifying_key key: {}", hex::encode(public_key.serialize()));
+                        info!("address is : {}", &address);
+
+                        let m = MyConfig {
+                            main: Main {
+                                key_type: key_type.unwrap(),
+                                secret_key: hex::encode(secret_key.as_ref()),
+                                public_key: hex::encode(public_key.serialize()),
+                                address,
+                            },
+                        };
+
+                        let config = toml::to_string(&m)?;
+                        info!("write config to : {}", config_path.to_str().unwrap());
+                        std::fs::write(config_path, config)?;
+
+                        std::process::exit(1);
+                    }
+                    _ => {
+                        error!("No key type specified");
+                        std::process::exit(1);
+                    }
+                }
+            }
         }
 
         Some(Command::Sign { file, msg }) => {
