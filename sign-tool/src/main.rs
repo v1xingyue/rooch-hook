@@ -27,60 +27,6 @@ pub struct Main {
     pub address: String,
 }
 
-#[derive(Parser)]
-#[command(version, about, long_about = None)]
-pub struct Cli {
-    /// Optional name to operate on
-    pub name: Option<String>,
-
-    /// hashtype you will used (sha224,sha256,sha512_224,sha512_256,sha384,sha512)
-    #[arg(long, default_value = "sha256")]
-    hash: Option<String>,
-
-    /// Optional debug mode
-    #[arg(short, long, default_value_t = false)]
-    pub debug: bool,
-
-    #[command(subcommand)]
-    pub command: Option<Command>,
-}
-
-#[derive(Subcommand)]
-pub enum Command {
-    /// init keypair
-    Init {
-        /// key type (ed25519,secp256k1)
-        #[arg(long, default_value = "ed25519")]
-        key_type: Option<String>,
-
-        /// name of the account
-        #[arg(short, long)]
-        address: String,
-    },
-
-    /// sign ed25519 signing
-    Sign {
-        /// file to sign (calulate hash bytes as sign input)
-        #[arg(short, long)]
-        file: Option<String>,
-
-        /// message to sign
-        #[arg(short, long)]
-        msg: Option<String>,
-    },
-
-    /// verify ed25519 signature
-    Verify {
-        /// message used to sign , msg should be hexed bytes
-        #[arg(short, long)]
-        msg: String,
-
-        /// signature to verify , signature should be hexed bytes
-        #[arg(short, long)]
-        signature: String,
-    },
-}
-
 fn config_path() -> Result<PathBuf> {
     let home_path = dirs::home_dir();
     if home_path.is_none() {
@@ -186,6 +132,60 @@ impl MyConfig {
             Ok(key_pair)
         }
     }
+}
+
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+pub struct Cli {
+    /// Optional name to operate on
+    pub name: Option<String>,
+
+    /// hashtype you will used (sha224,sha256,sha512_224,sha512_256,sha384,sha512)
+    #[arg(long, default_value = "sha256")]
+    hash: Option<String>,
+
+    /// Optional debug mode
+    #[arg(short, long, default_value_t = false)]
+    pub debug: bool,
+
+    #[command(subcommand)]
+    pub command: Option<Command>,
+}
+
+#[derive(Subcommand)]
+pub enum Command {
+    /// init keypair
+    Init {
+        /// key type (ed25519,secp256k1)
+        #[arg(long, default_value = "ed25519")]
+        key_type: Option<String>,
+
+        /// name of the account
+        #[arg(short, long)]
+        address: String,
+    },
+
+    /// sign ed25519 signing
+    Sign {
+        /// file to sign (calulate hash bytes as sign input)
+        #[arg(short, long)]
+        file: Option<String>,
+
+        /// message to sign
+        #[arg(short, long)]
+        msg: Option<String>,
+    },
+
+    /// verify ed25519 signature
+    Verify {
+        /// message used to sign , msg should be hexed bytes
+        #[arg(short, long)]
+        msg: String,
+
+        /// signature to verify , signature should be hexed bytes
+        #[arg(short, long)]
+        signature: String,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
