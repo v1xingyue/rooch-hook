@@ -9,7 +9,7 @@ use {
     log::{debug, error, info},
     rand::rngs::OsRng,
     serde::{Deserialize, Serialize},
-    sha2::{digest::DynDigest, Digest, Sha256, Sha512},
+    sha2::{digest::DynDigest, Digest, Sha224, Sha256, Sha384, Sha512, Sha512_224, Sha512_256},
     std::{fs, path::PathBuf},
 };
 
@@ -31,9 +31,9 @@ pub struct Cli {
     /// Optional name to operate on
     pub name: Option<String>,
 
-    /// hashtype you will used (sha256, sha512)
+    /// hashtype you will used (sha224,sha256,sha512_224,sha512_256,sha384,sha512)
     #[arg(long, default_value = "sha256")]
-    hash_type: Option<String>,
+    hash: Option<String>,
 
     /// Optional debug mode
     #[arg(short, long, default_value_t = false)]
@@ -54,7 +54,7 @@ pub enum Command {
 
     /// sign ed25519 signing
     Sign {
-        /// file to sign (calulate sha256 bytes as sign input)
+        /// file to sign (calulate hash bytes as sign input)
         #[arg(short, long)]
         file: Option<String>,
 
@@ -108,11 +108,21 @@ fn main() -> anyhow::Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or(default_level)).init();
 
     let mut hasher: Box<dyn DynDigest> = {
-        match cli.hash_type {
-            Some(ref s) if s == "sha256" => Box::new(Sha256::new()),
-            Some(ref s) if s == "sha512" => Box::new(Sha512::new()),
+        match cli.hash {
+            Some(ref s) => match s.as_str() {
+                "sha224" => Box::new(Sha224::new()),
+                "sha256" => Box::new(Sha256::new()),
+                "sha512_224" => Box::new(Sha512_224::new()),
+                "sha512_256" => Box::new(Sha512_256::new()),
+                "sha384" => Box::new(Sha384::new()),
+                "sha512" => Box::new(Sha512::new()),
+                _ => {
+                    error!("Unsupported hash type: {}", cli.hash.unwrap());
+                    std::process::exit(1)
+                }
+            },
             _ => {
-                error!("Unsupported hash type: {}", cli.hash_type.unwrap());
+                error!("Unsupported hash type: {}", cli.hash.unwrap());
                 std::process::exit(1);
             }
         }
@@ -163,7 +173,7 @@ fn main() -> anyhow::Result<()> {
                     if !myconfig.main.address.is_empty() {
                         println!("Address: {}", myconfig.main.address);
                     }
-                    println!("Hash (sha256) : {}", hex::encode(hash));
+                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             } else {
@@ -175,7 +185,7 @@ fn main() -> anyhow::Result<()> {
                 if !myconfig.main.address.is_empty() {
                     println!("Address: {}", myconfig.main.address);
                 }
-                println!("Hash(sha256): {}", hex::encode(hash));
+                println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
                 println!("Signature: {}", hex::encode(signature.to_bytes()));
             }
         }

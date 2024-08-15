@@ -22,7 +22,9 @@ const parseCommitMessge = (msg: string) => {
     };
   } else {
     let count = sign_parts.length;
-    let msg_hash = String(sign_parts[count - 2]).substring(16);
+    let msg_hash = String(sign_parts[count - 2])
+      .split(":")[1]
+      .trim();
     let msg_signate = String(sign_parts[count - 1]).substring(11);
     return {
       messageBody,
