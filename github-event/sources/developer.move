@@ -26,6 +26,8 @@ module github_event::developer {
         signer_pub: vector<u8>,
     }
 
+    struct AdminCap has key {}
+
     struct Repo has store {
         owner: address,
         repo_name: String,
@@ -39,6 +41,7 @@ module github_event::developer {
     fun init(){
         let signer = moveos_std::signer::module_signer<Repos>();
         account::move_resource_to(&signer, Repos { repos: table::new() });
+        account::move_resource_to(&signer, AdminCap {});
     }
 
     entry fun mint_developer(signer:&signer,name:String,signer_pub:vector<u8>){
