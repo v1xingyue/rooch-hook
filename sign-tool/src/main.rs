@@ -109,23 +109,14 @@ impl MyConfig {
     }
 
     pub fn load_secp256k1(&self) -> Result<Keypair, anyhow::Error> {
-        let config_path = config_path()?;
-        if !config_path.exists() {
-            Err(anyhow::anyhow!(
-                "Failed to load config file, please run `init` first"
-            ))
-        } else {
-            let secp = Secp256k1::new();
-            let config_content = fs::read_to_string(config_path)?;
-            let config: MyConfig = toml::from_str(&config_content)?;
-            let key_bytes = hex::decode(&config.main.secret_key).unwrap();
-            let key_array: [u8; 32] = key_bytes
-                .try_into()
-                .expect("secret_key must be 32 bytes long");
-            let secret_key = SecretKey::from_slice(&key_array)?;
-            let key_pair = Keypair::from_secret_key(&secp, &secret_key);
-            Ok(key_pair)
-        }
+        let secp = Secp256k1::new();
+        let key_bytes = hex::decode(&self.main.secret_key)?;
+        let key_array: [u8; 32] = key_bytes
+            .try_into()
+            .expect("secret_key must be 32 bytes long");
+        let secret_key = SecretKey::from_slice(&key_array)?;
+        let key_pair = Keypair::from_secret_key(&secp, &secret_key);
+        Ok(key_pair)
     }
 }
 
@@ -228,27 +219,22 @@ fn main() -> anyhow::Result<()> {
                 let key_pair = config.load_secp256k1()?;
                 debug!("public_key : {}", key_pair.public_key().to_string());
                 if msg.is_none() {
-                    if file.is_none() {
-                        error!("No file or msg specified");
-                    } else {
-                        let file_content = fs::read_to_string(file.unwrap())?;
-                        debug!("file content: {}", file_content);
-                        hasher.update(file_content.trim().as_bytes());
-                        if !config.main.address.is_empty() {
-                            hasher.update(config.main.address.trim().as_bytes())
-                        }
-                        let hash = hasher.finalize();
-                        let message = Message::from_digest_slice(&hash)?;
-                        let signature = secp.sign_ecdsa(&message, &key_pair.secret_key());
-                        if !config.main.address.is_empty() {
-                            println!("Address: {}", config.main.address);
-                        }
-                        println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
-                        println!("Signature: {}", hex::encode(signature.serialize_compact()));
+                    let file_content = fs::read_to_string(file.unwrap())?;
+                    debug!("file content: {}", file_content);
+                    hasher.update(file_content.trim().as_bytes());
+                    if !config.main.address.is_empty() {
+                        hasher.update(config.main.address.trim().as_bytes())
                     }
+                    let hash = hasher.finalize();
+                    let message = Message::from_digest_slice(&hash)?;
+                    let signature = secp.sign_ecdsa(&message, &key_pair.secret_key());
+                    if !config.main.address.is_empty() {
+                        println!("Address: {}", config.main.address);
+                    }
+                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
+                    println!("Signature: {}", hex::encode(signature.serialize_compact()));
                 } else {
                     debug!("sign as msg mode...");
-                    // let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
                     hasher.update(msg.unwrap().trim().as_bytes());
                     let hash = hasher.finalize();
                     let message = Message::from_digest_slice(&hash)?;
@@ -263,23 +249,19 @@ fn main() -> anyhow::Result<()> {
                 let mut key_pair = config.load_ed25519()?;
                 debug!("public_key : {:?}", key_pair.verifying_key().to_bytes());
                 if msg.is_none() {
-                    if file.is_none() {
-                        error!("No file or msg specified");
-                    } else {
-                        let file_content = fs::read_to_string(file.unwrap())?;
-                        debug!("file content: {}", file_content);
-                        hasher.update(file_content.trim().as_bytes());
-                        if !config.main.address.is_empty() {
-                            hasher.update(config.main.address.trim().as_bytes())
-                        }
-                        let hash = hasher.finalize();
-                        let signature = key_pair.sign(&hash);
-                        if !config.main.address.is_empty() {
-                            println!("Address: {}", config.main.address);
-                        }
-                        println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
-                        println!("Signature: {}", hex::encode(signature.to_bytes()));
+                    let file_content = fs::read_to_string(file.unwrap())?;
+                    debug!("file content: {}", file_content);
+                    hasher.update(file_content.trim().as_bytes());
+                    if !config.main.address.is_empty() {
+                        hasher.update(config.main.address.trim().as_bytes())
                     }
+                    let hash = hasher.finalize();
+                    let signature = key_pair.sign(&hash);
+                    if !config.main.address.is_empty() {
+                        println!("Address: {}", config.main.address);
+                    }
+                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
+                    println!("Signature: {}", hex::encode(signature.to_bytes()));
                 } else {
                     debug!("sign as msg mode...");
                     // let hash = Sha256::digest(msg.unwrap().trim()).to_vec();
@@ -327,7 +309,7 @@ fn main() -> anyhow::Result<()> {
                 }
             }
         }
-        None => {
+        _ => {
             error!("No command specified");
             Cli::parse_from(&["sign-tool", "--help"]);
             std::process::exit(1);
