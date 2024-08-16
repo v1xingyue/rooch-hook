@@ -61,47 +61,42 @@ impl MyConfig {
             key_type.as_ref().unwrap()
         );
 
-        match key_type.as_deref() {
+        info!("address is : {}", &address);
+
+        let (secret_key, verify_key) = match key_type.as_deref() {
             Some("ed25519") => {
                 let signing_key = SigningKey::generate(&mut OsRng);
-                let secretkey_str = hex::encode(signing_key.to_bytes());
                 let verifying_key = VerifyingKey::from(&signing_key);
-                let publickey_str = hex::encode(verifying_key.to_bytes());
-                info!(
-                    "verifying_key key: {}",
-                    hex::encode(verifying_key.to_bytes())
-                );
-                info!("address is : {}", &address);
-                MyConfig {
-                    main: Main {
-                        key_type: key_type.unwrap(),
-                        secret_key: secretkey_str,
-                        public_key: publickey_str,
-                        address,
-                    },
-                }
+                info!("verifying_key : {}", hex::encode(verifying_key.to_bytes()));
+                (
+                    signing_key.to_bytes().to_vec(),
+                    verifying_key.to_bytes().to_vec(),
+                )
             }
             Some("secp256k1") => {
                 let secp = Secp256k1::new();
                 let secret_key = SecretKey::new(&mut OsRng);
                 let key_pair = Keypair::from_secret_key(&secp, &secret_key);
                 let public_key = key_pair.public_key();
-                info!("verifying_key key: {}", hex::encode(public_key.serialize()));
-                info!("address is : {}", &address);
-                MyConfig {
-                    main: Main {
-                        key_type: key_type.unwrap(),
-                        secret_key: hex::encode(secret_key.as_ref()),
-                        public_key: hex::encode(public_key.serialize()),
-                        address,
-                    },
-                }
+                info!("verifying_key : {}", hex::encode(public_key.serialize()));
+                (
+                    secret_key.as_ref().to_vec(),
+                    public_key.serialize().to_vec(),
+                )
             }
             _ => {
                 error!("No key type specified");
                 std::process::exit(1);
             }
-        }
+        };
+        return MyConfig {
+            main: Main {
+                key_type: key_type.unwrap_or("ed25519".to_string()),
+                secret_key: hex::encode(secret_key),
+                public_key: hex::encode(verify_key),
+                address,
+            },
+        };
     }
 
     pub fn load_ed25519(&self) -> Result<SigningKey, anyhow::Error> {
