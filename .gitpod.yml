@@ -6,3 +6,4 @@ tasks:
       sudo mv rooch-artifacts/rooch /bin/rooch
       rooch init --skip-password
       rooch account list --json
+      cd / ; sudo git clone https://github.com/rooch-network/rooch.git
