@@ -1,0 +1,5 @@
+tasks:
+  - init: |
+      sudo apt-get install wget -y
+      wget https://github.com/rooch-network/rooch/releases/download/v0.6.8/rooch-ubuntu-22.04.zip
+      mv rooch-artifacts/rooch /bin/rooch
