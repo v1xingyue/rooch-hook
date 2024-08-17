@@ -35,7 +35,7 @@ const main = async () => {
 
   const mint_tx = new Transaction();
   mint_tx.callFunction({
-    target: `${package_address}::developer::mint`,
+    target: `${package_address}::developer::mint_developer`,
     args: [
       Args.string("v1xingyue"),
       Args.vec(

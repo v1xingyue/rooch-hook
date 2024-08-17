@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "mint": "ts-node src/mint.ts",
+    "mint": "ts-node src/mint_developer.ts",
+    "create_repo": "ts-node src/create_repo.ts",
     "items": "ts-node src/items.ts"
   },
   "keywords": [],
