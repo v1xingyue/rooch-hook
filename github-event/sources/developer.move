@@ -15,6 +15,7 @@ module github_event::developer {
     const E_HOOK_NOT_REPO_OWNER: u64 = 4;
 
     struct Commit has store {
+        commit_address: address,
         commit_time : u64,
         message: String,
         commit_url: String,
@@ -62,7 +63,7 @@ module github_event::developer {
         assert!(table::contains(&repos.repos, repo_url), E_REPO_NOT_EXIST);
         let repo = table::borrow_mut(&mut repos.repos, repo_url);
         assert!(repo.owner == signer::address_of(signer),E_HOOK_NOT_REPO_OWNER);
-        table_vec::push_back(&mut repo.commits, Commit { commit_time,message,commit_url,commit_user});
+        table_vec::push_back(&mut repo.commits, Commit { commit_time,message,commit_url,commit_user,commit_address});
     }
 
     entry fun update_pub(signer:&signer,signer_pub:vector<u8>){
