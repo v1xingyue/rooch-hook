@@ -50,6 +50,8 @@ That can be our public hook:
 
 Subscribe your github repo webhook to our public hooks. It will help bring your github commit with sinature to the rooch.
 
+Also you should change the content-type to **application/json** .
+
 ### 5. some useful functions
 
 - rooch move run --function default::developer::commit --args "String:repor_url" --args "String:commit_url" --args "String:commit message" --args 'raw:a17a7b477a' --args 'raw:a17a7b477a'
