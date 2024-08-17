@@ -52,6 +52,7 @@ export default function Main({ table_id }: { table_id: string }) {
             <td>Commit time </td>
             <td>Commit url </td>
             <td>Commit message </td>
+            <td>Commit address </td>
             <td>Commit username </td>
           </tr>
           {commits &&
@@ -62,6 +63,7 @@ export default function Main({ table_id }: { table_id: string }) {
                   <td>{decode_value.commit_time}</td>
                   <td>{decode_value.commit_url}</td>
                   <td>{decode_value.message}</td>
+                  <td>{decode_value.commit_address}</td>
                   <td>{decode_value.commit_user}</td>
                 </tr>
               );

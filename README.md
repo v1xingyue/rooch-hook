@@ -4,7 +4,7 @@
 
 ## How to use rooch hook
 
-### 1. install ed25519-tool
+### 1. install sign-tool
 
 ```shell
 cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch  main
@@ -33,7 +33,7 @@ rooch move publish --max-gas-amount 800000000
 ### 3. mint developer info
 
 ```shell
-rooch move run --function default::developer::mint --args "String:v1xingyue" --args "String:6382c729be8d6c0b4306d88037b4658bcb31f5f33f50230da6b925c1b8dd5719"
+rooch move run --function default::developer::mint_developer --args "String:v1xingyue" --args "String:6382c729be8d6c0b4306d88037b4658bcb31f5f33f50230da6b925c1b8dd5719"
 ```
 
 also you can check developer info:
