@@ -4,7 +4,6 @@ import {
   Secp256k1Keypair,
   Transaction,
   getRoochNodeUrl,
-  toHEX,
   fromHEX,
 } from "@roochnetwork/rooch-sdk";
 import path from "path";
