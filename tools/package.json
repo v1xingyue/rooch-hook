@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "mint": "ts-node src/mint_developer.ts",
+    "update_pub": "ts-node src/update_pub.ts",
     "create_repo": "ts-node src/create_repo.ts",
     "items": "ts-node src/items.ts"
   },
