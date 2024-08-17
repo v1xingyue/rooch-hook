@@ -10,7 +10,7 @@ use {
     rand::rngs::OsRng,
     secp256k1::{Keypair, Message, Secp256k1, SecretKey},
     serde::{Deserialize, Serialize},
-    sha2::{digest::DynDigest, Digest, Sha224, Sha256, Sha384, Sha512, Sha512_224, Sha512_256},
+    sha2::{digest::DynDigest, Digest,Sha256},
     std::{fs, path::PathBuf},
 };
 
@@ -208,7 +208,6 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
-                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.serialize_compact()));
                 } else {
                     debug!("sign as msg mode...");
@@ -219,7 +218,6 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
-                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.serialize_compact()));
                 }
             } else {
@@ -237,7 +235,6 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
-                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 } else {
                     debug!("sign as msg mode...");
@@ -248,7 +245,6 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
-                    println!("Hash ({}) : {}", cli.hash.unwrap(), hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             }
@@ -295,3 +291,4 @@ fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
+
