@@ -13,6 +13,7 @@ cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch  main
 put your hook content to **.git/hooks/prepare-commit-msg**:
 
 ```shell
+cat > .git/hooks/prepare-commit-msg << 'EOF'
 #!/bin/bash
 
 COMMIT_MSG_FILE=$1
@@ -20,7 +21,7 @@ CUSTOM_SIGNATURE=$(sign-tool sign -f $COMMIT_MSG_FILE)
 
 # Append the custom signature to the commit message
 echo -e "\n$CUSTOM_SIGNATURE" >> "$COMMIT_MSG_FILE"
-
+EOF
 ```
 
 ### 2. deploy your own contract about your github repo
