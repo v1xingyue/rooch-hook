@@ -60,6 +60,7 @@ const Header = () => {
         <span style={{ float: "right" }}>
           {!session ? (
             <Button
+              color="success"
               variant="contained"
               sx={{ marginRight: "1rem" }}
               onClick={handlerCreateSessionKey}
@@ -68,7 +69,7 @@ const Header = () => {
             </Button>
           ) : (
             <Button
-              color="warning"
+              color="error"
               sx={{ marginRight: "1rem" }}
               variant="contained"
               onClick={async () => {
