@@ -1,32 +1,6 @@
 "use client";
 
-import { getRoochNodeUrl, RoochClient } from "@roochnetwork/rooch-sdk";
-import { useQuery } from "@tanstack/react-query";
-
-const useCommitList = (network: any, tableId: string | undefined) => {
-  return useQuery({
-    queryKey: ["repos", tableId, network],
-    queryFn: async () => {
-      if (tableId) {
-        const client = new RoochClient({
-          url: getRoochNodeUrl(network as any),
-        });
-        const commits = await client.listStates({
-          accessPath: `/table/${tableId}`,
-          stateOption: {
-            decode: true,
-            showDisplay: false,
-          },
-        });
-        return commits.data as any[];
-      } else {
-        return [];
-      }
-    },
-    enabled: !!tableId && !!network,
-    refetchInterval: 10000,
-  });
-};
+import useRoochTableData from "@/app/hooks/tables";
 
 export default function Main({ table_id }: { table_id: string }) {
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -38,7 +12,7 @@ export default function Main({ table_id }: { table_id: string }) {
     data: commits,
     isLoading: isLoadingCommits,
     error: commitsError,
-  } = useCommitList(network, table_id as string);
+  } = useRoochTableData("commits-list", network, table_id as string);
 
   return (
     <main className="main">

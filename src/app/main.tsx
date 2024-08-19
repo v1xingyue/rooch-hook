@@ -1,34 +1,17 @@
 "use client";
 
-import { getRoochNodeUrl, RoochClient } from "@roochnetwork/rooch-sdk";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import useRepos from "./hooks/repos";
-
-const useReposList = (network: any, tableId: string | undefined) => {
-  return useQuery({
-    queryKey: ["repos", tableId, network],
-    queryFn: async () => {
-      if (tableId) {
-        const client = new RoochClient({
-          url: getRoochNodeUrl(network as any),
-        });
-        const commits = await client.listStates({
-          accessPath: `/table/${tableId}`,
-          stateOption: {
-            decode: true,
-            showDisplay: false,
-          },
-        });
-        return commits.data as any[];
-      } else {
-        return [];
-      }
-    },
-    enabled: !!tableId && !!network,
-    refetchInterval: 10000,
-  });
-};
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import useRoochTableData from "./hooks/tables";
 
 export default function Main() {
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -43,7 +26,7 @@ export default function Main() {
     data: repos,
     isLoading: isLoadingCommits,
     error: commitsError,
-  } = useReposList(network, tableID);
+  } = useRoochTableData("repos-list", network, tableID);
 
   return (
     <main className="main">
@@ -52,30 +35,43 @@ export default function Main() {
       </h3>
       <p>TableID : {tableID}</p>
       <div>
-        <table>
-          <tr>
-            <td>Repo owner </td>
-            <td>Repo name </td>
-            <td>Link</td>
-          </tr>
-          {repos &&
-            repos.map((repo) => {
-              let decode_value = repo.state.decoded_value.value.value.value;
-              return (
-                <tr key={repo.field_key}>
-                  <td>{decode_value.owner}</td>
-                  <td>{decode_value.repo_name}</td>
-                  <td>
-                    <Link
-                      href={`commits/${decode_value.commits.value.contents.value.handle.value.id}`}
-                    >
-                      Commits
-                    </Link>
-                  </td>
-                </tr>
-              );
-            })}
-        </table>
+        <TableContainer
+          component={Paper}
+          sx={{ marginTop: "2rem", width: "100%" }}
+        >
+          <Table sx={{ width: "100%", tableLayout: "fixed" }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Repo owner</TableCell>
+                <TableCell align="right">Repo name</TableCell>
+                <TableCell align="right">Link</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {repos &&
+                repos.map((repo) => {
+                  let decode_value = repo.state.decoded_value.value.value.value;
+                  return (
+                    <TableRow key={repo.field_key}>
+                      <TableCell component="th" scope="row">
+                        {decode_value.owner}
+                      </TableCell>
+                      <TableCell align="right">
+                        {decode_value.repo_name}
+                      </TableCell>
+                      <TableCell align="right">
+                        <Link
+                          href={`commits/${decode_value.commits.value.contents.value.handle.value.id}`}
+                        >
+                          Commits
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     </main>
   );
