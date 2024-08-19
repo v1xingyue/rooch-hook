@@ -39,8 +39,8 @@ export default function Main() {
           <Table sx={{ width: "100%" }}>
             <TableHead>
               <TableRow>
+                <TableCell align="left">Repo name</TableCell>
                 <TableCell>Repo owner</TableCell>
-                <TableCell align="right">Repo name</TableCell>
                 <TableCell align="right">Link</TableCell>
               </TableRow>
             </TableHead>
@@ -50,11 +50,11 @@ export default function Main() {
                   let decode_value = repo.state.decoded_value.value.value.value;
                   return (
                     <TableRow key={repo.field_key}>
+                      <TableCell align="left">
+                        {decode_value.repo_name}
+                      </TableCell>
                       <TableCell component="th" scope="row">
                         {decode_value.owner}
-                      </TableCell>
-                      <TableCell align="right">
-                        {decode_value.repo_name}
                       </TableCell>
                       <TableCell align="right">
                         <Link
