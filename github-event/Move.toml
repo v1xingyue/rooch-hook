@@ -3,9 +3,9 @@ name = "github-event"
 version = "0.0.1"
 
 [dependencies]
-MoveStdlib = { local = "../../../rooch/frameworks/move-stdlib" }
-MoveosStdlib = { local = "../../../rooch/frameworks/moveos-stdlib" }
-RoochFramework = { local = "../../../rooch/frameworks/rooch-framework" }
+MoveStdlib = { local = "../../rooch/frameworks/move-stdlib" }
+MoveosStdlib = { local = "../../rooch/frameworks/moveos-stdlib" }
+RoochFramework = { local = "../../rooch/frameworks/rooch-framework" }
 
 [addresses]
 github_event = "0x71312885057e2ec6c04c9ded699e246d0e05dc195eb0cec1530b999d2aec4026"

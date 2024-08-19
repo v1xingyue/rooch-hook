@@ -32,6 +32,7 @@ module github_event::developer {
     struct Repo has store {
         owner: address,
         repo_name: String,
+        repo_url: String,
         commits: table_vec::TableVec<Commit>,
     }
 
@@ -52,7 +53,7 @@ module github_event::developer {
     entry fun create_repo(signer:&signer,repo_url:String,repo_name:String){
         let repos = account::borrow_mut_resource<Repos>(@github_event); 
         assert!(!table::contains(&repos.repos, repo_url), E_REPO_EXIST);
-        table::add(&mut repos.repos, repo_url, Repo { owner: signer::address_of(signer), repo_name, commits: table_vec::new() });
+        table::add(&mut repos.repos, repo_url, Repo { owner: signer::address_of(signer), repo_name, commits: table_vec::new(),repo_url});
     }
     
     // only can be called by repo hook with his signer pub
