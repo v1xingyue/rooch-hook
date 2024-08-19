@@ -1,5 +1,7 @@
 "use client";
 
+import { DataGrid } from "@mui/x-data-grid";
+
 import Link from "next/link";
 import useRepos from "./hooks/repos";
 import {
@@ -35,40 +37,40 @@ export default function Main() {
       </h3>
       <p>TableID : {tableID}</p>
       <div>
-        <TableContainer component={Paper}>
-          <Table sx={{ width: "100%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell align="left">Repo name</TableCell>
-                <TableCell>Repo owner</TableCell>
-                <TableCell align="right">Link</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {repos &&
-                repos.map((repo) => {
-                  let decode_value = repo.state.decoded_value.value.value.value;
-                  return (
-                    <TableRow key={repo.field_key}>
-                      <TableCell align="left">
-                        {decode_value.repo_name}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {decode_value.owner}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Link
-                          href={`commits/${decode_value.commits.value.contents.value.handle.value.id}`}
-                        >
-                          Commits
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {repos && (
+          <DataGrid
+            sx={{ width: "100%" }}
+            rows={repos.map((repo) => {
+              let decode_value = repo.state.decoded_value.value.value.value;
+              return {
+                id: repo.field_key,
+                repo_name: decode_value.repo_name,
+                owner: decode_value.owner,
+                link: `commits/${decode_value.commits.value.contents.value.handle.value.id}`,
+              };
+            })}
+            columns={[
+              { field: "repo_name", headerName: "Repo name", flex: 1 },
+              { field: "owner", headerName: "Repo owner", flex: 2 },
+              {
+                field: "link",
+                headerName: "Link",
+                flex: 1,
+                renderCell: (params) => (
+                  <a
+                    href={params.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Commits
+                  </a>
+                ),
+              },
+            ]}
+            autoHeight
+            disableRowSelectionOnClick
+          />
+        )}
       </div>
     </main>
   );

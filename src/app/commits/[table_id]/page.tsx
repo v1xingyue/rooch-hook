@@ -11,6 +11,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 
 export default function Home({ params }: { params: { table_id: string } }) {
   const { table_id } = params;
@@ -32,39 +33,63 @@ export default function Home({ params }: { params: { table_id: string } }) {
       </h3>
       <p>Commit TableID : {table_id}</p>
       <div>
-        <TableContainer component={Paper}>
-          <Table sx={{ width: "100%" }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Commit time</TableCell>
-                <TableCell>Commit message</TableCell>
-                <TableCell>Commit address</TableCell>
-                <TableCell>Commit username</TableCell>
-                <TableCell>Commit Link</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {commits &&
-                commits.map((commit) => {
-                  let decode_value =
-                    commit.state.decoded_value.value.value.value;
-                  return (
-                    <TableRow key={commit.field_key}>
-                      <TableCell>{decode_value.commit_time}</TableCell>
-                      <TableCell>{decode_value.message}</TableCell>
-                      <TableCell>
-                        {shortAddress(decode_value.commit_address)}
-                      </TableCell>
-                      <TableCell>{decode_value.commit_user}</TableCell>
-                      <TableCell>
-                        <a href={decode_value.commit_url}>Github</a>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {commits && (
+          <DataGrid
+            initialState={{
+              sorting: {
+                sortModel: [
+                  {
+                    field: "commit_time",
+                    sort: "desc",
+                  },
+                ],
+              },
+            }}
+            sx={{ width: "100%" }}
+            rows={commits.map((commit) => {
+              let decode_value = commit.state.decoded_value.value.value.value;
+              return {
+                id: commit.field_key,
+                commit_time: decode_value.commit_time,
+                message: decode_value.message,
+                commit_address: shortAddress(decode_value.commit_address),
+                commit_user: decode_value.commit_user,
+                commit_url: decode_value.commit_url,
+              };
+            })}
+            columns={[
+              {
+                field: "commit_time",
+                headerName: "Commit time",
+                flex: 1,
+                sortable: true,
+              },
+              { field: "message", headerName: "Commit message", flex: 2 },
+              {
+                field: "commit_address",
+                headerName: "Commit address",
+                flex: 1,
+              },
+              { field: "commit_user", headerName: "Commit username", flex: 1 },
+              {
+                field: "commit_url",
+                headerName: "Commit Link",
+                flex: 1,
+                renderCell: (params) => (
+                  <a
+                    href={params.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Github
+                  </a>
+                ),
+              },
+            ]}
+            autoHeight
+            disableRowSelectionOnClick
+          />
+        )}
       </div>
     </>
   );
