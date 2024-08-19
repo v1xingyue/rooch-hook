@@ -1,5 +1,6 @@
 import { Container } from "@mui/material";
 import type { Metadata } from "next";
+import AppWrapper from "./components/AppWrapper";
 
 export const metadata: Metadata = {
   title: "Rooch Hook --- Collect Github Events With Rooch",
@@ -18,9 +19,9 @@ export default function RootLayout({
           sx={{
             padding: "2rem",
           }}
-          maxWidth="lg"
+          maxWidth={"xl"}
         >
-          {children}
+          <AppWrapper>{children}</AppWrapper>
         </Container>
       </body>
     </html>
