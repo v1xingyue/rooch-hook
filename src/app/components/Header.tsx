@@ -11,6 +11,8 @@ import { shortAddress } from "./util";
 import Button from "@mui/material/Button";
 import { Link, Stack } from "@mui/material";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const Header = () => {
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -23,7 +25,7 @@ const Header = () => {
   const { mutateAsync: connectWallet } = useConnectWallet();
   const session = useCurrentSession();
   const [sessionLoading, setSessionLoading] = useState(false);
-
+  const [clearSessionLoading, setClearSessionLoading] = useState(false);
   const { mutateAsync: createSessionKey } = useCreateSessionKey();
   const { mutateAsync: removeSessionKey } = useRemoveSession();
   const handlerCreateSessionKey = async () => {
@@ -43,9 +45,17 @@ const Header = () => {
       {
         onSuccess: (result) => {
           console.log("session key", result);
+          toast.success("Session key created", {
+            position: "top-right",
+            autoClose: 2000,
+          });
         },
         onError: (why) => {
           console.log(why);
+          toast.error("Failed to create session key", {
+            position: "top-right",
+            autoClose: 2000,
+          });
         },
       }
     ).finally(() => setSessionLoading(false));
@@ -59,29 +69,46 @@ const Header = () => {
         </Link>
         <span style={{ float: "right" }}>
           {!session ? (
-            <Button
+            <LoadingButton
+              loading={sessionLoading}
+              loadingPosition="start"
               color="success"
               variant="contained"
-              sx={{ marginRight: "1rem" }}
+              sx={{
+                marginRight: "1rem",
+              }}
               onClick={handlerCreateSessionKey}
             >
               Init Session
-            </Button>
+            </LoadingButton>
           ) : (
-            <Button
+            <LoadingButton
               color="error"
               sx={{ marginRight: "1rem" }}
               variant="contained"
+              loading={clearSessionLoading}
+              loadingPosition="start"
               onClick={async () => {
+                setClearSessionLoading(true);
                 console.log(session.getAuthKey());
-                const result = await removeSessionKey({
-                  authKey: session.getAuthKey(),
-                });
-                console.log(result);
+                const result = await removeSessionKey(
+                  {
+                    authKey: session.getAuthKey(),
+                  },
+                  {
+                    onSuccess: () => {
+                      toast.success("Session key removed", {
+                        position: "top-right",
+                        autoClose: 2000,
+                      });
+                    },
+                  }
+                );
+                setClearSessionLoading(false);
               }}
             >
               Clear Session
-            </Button>
+            </LoadingButton>
           )}
 
           <Button
