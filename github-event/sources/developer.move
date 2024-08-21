@@ -10,7 +10,7 @@ module github_event::developer {
     use moveos_std::hex;
     use github_event::rhec_coin;
     
-    
+
     const E_REPO_EXIST : u64 = 1;
     const E_REPO_NOT_EXIST : u64 = 2;
     const E_COMMIT_VERIFY_FAILED: u64 = 3;
@@ -26,7 +26,7 @@ module github_event::developer {
 
     struct DeveloperInfo has key {
         name: String,
-        signer_pub: vector<u8>,
+        signer_pub: vector<u8>
     }
 
     struct AdminCap has key {}
@@ -52,6 +52,20 @@ module github_event::developer {
         account::move_resource_to(signer, DeveloperInfo { name,signer_pub});
     }
 
+    entry fun update_developer_info(signer:&signer,name:String,signer_pub:vector<u8>){
+        let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
+        dev_info.name = name;
+        dev_info.signer_pub = signer_pub;
+    }
+
+    entry fun update_or_mint(signer:&signer,name:String,signer_pub:vector<u8>){
+        if(account::exists_resource<DeveloperInfo>(signer::address_of(signer))){
+            update_developer_info(signer,name,signer_pub);
+        }else{
+            mint_developer(signer,name,signer_pub);
+        }
+    }
+
     entry fun create_repo(signer:&signer,repo_url:String,repo_name:String){
         let repos = account::borrow_mut_resource<Repos>(@github_event); 
         assert!(!table::contains(&repos.repos, repo_url), E_REPO_EXIST);
@@ -70,8 +84,8 @@ module github_event::developer {
 
         if (rhec_coin::get_treasury_balance() > 0) {
             rhec_coin::mint_to(signer, 1000);
+            let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
         };
-
     }
 
     entry fun update_pub(signer:&signer,signer_pub:vector<u8>){
