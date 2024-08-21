@@ -9,13 +9,23 @@ import {
 } from "@roochnetwork/rooch-sdk-kit";
 import { shortAddress } from "./util";
 import Button from "@mui/material/Button";
-import { Link, Stack } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Chip,
+  Container,
+  Link,
+  Stack,
+  Toolbar,
+} from "@mui/material";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { toastOptions } from "../config";
+import useCoinBalance from "../hooks/rhec_coins";
 
 const Header = () => {
+  const network = process.env.NEXT_PUBLIC_NETWORK;
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
   const currentAddress = useCurrentAddress();
   const wallets = useWallets();
@@ -29,6 +39,10 @@ const Header = () => {
   const [clearSessionLoading, setClearSessionLoading] = useState(false);
   const { mutateAsync: createSessionKey } = useCreateSessionKey();
   const { mutateAsync: removeSessionKey } = useRemoveSession();
+  const { data: coinBalance } = useCoinBalance(
+    network,
+    currentAddress?.genRoochAddress().toStr()!
+  );
   const handlerCreateSessionKey = async () => {
     if (sessionLoading) {
       return;
@@ -60,12 +74,40 @@ const Header = () => {
   };
 
   return (
-    <Stack position="static" color="default" justifyContent="flex-end">
-      <div>
-        <Link href="/" style={{ textDecoration: "none", fontWeight: "bold" }}>
-          Rooch Hooks
-        </Link>
-        <span style={{ float: "right" }}>
+    <AppBar position="static" color="transparent" elevation={0}>
+      <Container maxWidth={false}>
+        <Toolbar>
+          <Link
+            href="/"
+            style={{ textDecoration: "none", fontWeight: "bold" }}
+            sx={{ flexGrow: 1 }}
+          >
+            Rooch Hooks
+          </Link>
+
+          {coinBalance && coinBalance.length > 0 ? (
+            <Box sx={{ marginRight: "1rem" }}>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: "1rem",
+                }}
+              >
+                {coinBalance.map((coin: any) => (
+                  <li key={coin.symbol}>
+                    <Chip
+                      label={`${coin.balance} $${coin.symbol}`}
+                      color="primary"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </Box>
+          ) : null}
           {!session ? (
             <LoadingButton
               loading={sessionLoading}
@@ -131,9 +173,9 @@ const Header = () => {
               ? shortAddress(currentAddress?.genRoochAddress().toStr(), 8, 6)
               : "Connect Wallet"}
           </Button>
-        </span>
-      </div>
-    </Stack>
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 };
 
