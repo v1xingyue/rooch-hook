@@ -100,7 +100,9 @@ const Header = () => {
                 {coinBalance.map((coin: any) => (
                   <li key={coin.symbol}>
                     <Chip
-                      label={`${coin.balance} $${coin.symbol}`}
+                      label={`${coin.balance / 10 ** coin.decimals} $${
+                        coin.symbol
+                      }`}
                       color="primary"
                     />
                   </li>
