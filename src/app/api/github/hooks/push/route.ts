@@ -41,7 +41,7 @@ export const POST = async (req: Request) => {
   let results = [];
   for (let commit of data.commits) {
     try {
-      const commit = data.commits[0] as any;
+      // const commit = data.commits[0] as any;
       const repo_url = data.repository.url as string;
       const commit_url = commit.url;
       const raw_message = commit.message as string;
