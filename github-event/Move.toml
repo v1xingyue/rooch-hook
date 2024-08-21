@@ -8,7 +8,7 @@ MoveosStdlib = { local = "../../rooch/frameworks/moveos-stdlib" }
 RoochFramework = { local = "../../rooch/frameworks/rooch-framework" }
 
 [addresses]
-github_event = "0x71312885057e2ec6c04c9ded699e246d0e05dc195eb0cec1530b999d2aec4026"
+github_event = "0xe42e88f0e87f799450c27e07d7d7d31ba0c379e007e6bdcfeb66964784360006"
 std = "0x1"
 moveos_std = "0x2"
 rooch_framework = "0x3"
