@@ -8,6 +8,8 @@ module github_event::developer {
     use moveos_std::timestamp;
     use rooch_framework::ed25519;
     use moveos_std::hex;
+    use github_event::rhec_coin;
+    
     
     const E_REPO_EXIST : u64 = 1;
     const E_REPO_NOT_EXIST : u64 = 2;
@@ -65,6 +67,11 @@ module github_event::developer {
         let repo = table::borrow_mut(&mut repos.repos, repo_url);
         assert!(repo.owner == signer::address_of(signer),E_HOOK_NOT_REPO_OWNER);
         table_vec::push_back(&mut repo.commits, Commit { commit_time,message,commit_url,commit_user,commit_address});
+
+        if (rhec_coin::get_treasury_balance() > 0) {
+            rhec_coin::mint_to(signer, 1000);
+        };
+
     }
 
     entry fun update_pub(signer:&signer,signer_pub:vector<u8>){
