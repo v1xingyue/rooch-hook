@@ -9,6 +9,8 @@ import { Container, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { Args, fromHEX, Transaction } from "@roochnetwork/rooch-sdk";
+import { toast } from "react-toastify";
+import { toastOptions } from "../config";
 
 const DeveloperInfo = () => {
   const network = useCurrentNetwork();
@@ -36,11 +38,17 @@ const DeveloperInfo = () => {
         Args.vec("u8", fromHEX(info.signer_pub) as any),
       ],
     });
-    const result = await signAndExecuteTransaction({
-      transaction: tx,
-    });
-    console.log(result);
-    setIsLoading(false);
+    try {
+      const result = await signAndExecuteTransaction({
+        transaction: tx,
+      });
+      console.log(result);
+      toast.success("Developer info updated", toastOptions);
+    } catch (error) {
+      toast.error("Failed to update developer info", toastOptions);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
