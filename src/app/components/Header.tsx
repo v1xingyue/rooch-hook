@@ -13,6 +13,7 @@ import { Link, Stack } from "@mui/material";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { toastOptions } from "../config";
 
 const Header = () => {
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -35,7 +36,7 @@ const Header = () => {
     setSessionLoading(true);
 
     const defaultScopes = [`${mypackage}::*::*`];
-    createSessionKey(
+    await createSessionKey(
       {
         appName: "rooch hook",
         appUrl: location.href,
@@ -45,20 +46,17 @@ const Header = () => {
       {
         onSuccess: (result) => {
           console.log("session key", result);
-          toast.success("Session key created", {
-            position: "top-right",
-            autoClose: 2000,
-          });
+          toast.success("Session key created", toastOptions);
         },
         onError: (why) => {
           console.log(why);
-          toast.error("Failed to create session key", {
-            position: "top-right",
-            autoClose: 2000,
-          });
+          toast.error("Failed to create session key", toastOptions);
+        },
+        onSettled: () => {
+          setSessionLoading(false);
         },
       }
-    ).finally(() => setSessionLoading(false));
+    );
   };
 
   return (
@@ -90,21 +88,28 @@ const Header = () => {
               loadingPosition="start"
               onClick={async () => {
                 setClearSessionLoading(true);
-                console.log(session.getAuthKey());
-                const result = await removeSessionKey(
-                  {
-                    authKey: session.getAuthKey(),
-                  },
-                  {
-                    onSuccess: () => {
-                      toast.success("Session key removed", {
-                        position: "top-right",
-                        autoClose: 2000,
-                      });
+                if (session) {
+                  await removeSessionKey(
+                    {
+                      authKey: session.getAuthKey(),
                     },
-                  }
-                );
-                setClearSessionLoading(false);
+                    {
+                      onSuccess: () => {
+                        toast.success("Session key removed", toastOptions);
+                      },
+                      onSettled: () => {
+                        setClearSessionLoading(false);
+                      },
+                      onError: (why) => {
+                        console.log(why);
+                        toast.error(
+                          "Failed to remove session key" + why,
+                          toastOptions
+                        );
+                      },
+                    }
+                  );
+                }
               }}
             >
               Clear Session

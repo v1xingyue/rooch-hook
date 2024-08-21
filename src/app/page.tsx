@@ -4,14 +4,15 @@ import { DataGrid } from "@mui/x-data-grid";
 import useRepos from "./hooks/repos";
 import useRoochTableData from "./hooks/tables";
 import DeveloperInfo from "./components/DeveloperInfo";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import { Transaction } from "@roochnetwork/rooch-sdk";
 import {
   useCurrentSession,
   UseSignAndExecuteTransaction,
 } from "@roochnetwork/rooch-sdk-kit";
 import { toast } from "react-toastify"; // Add this import
+import React from "react";
+import { toastOptions } from "./config";
+import { CreateRepoDialog } from "./dialogs/createRepo";
 
 export default function Main() {
   const session = useCurrentSession();
@@ -31,33 +32,6 @@ export default function Main() {
     error: commitsError,
   } = useRoochTableData("repos-list", network, tableID);
 
-  const handleCreateRepo = async () => {
-    if (session) {
-      const txn = new Transaction();
-      txn.callFunction({
-        function: "create_repo",
-        module: "",
-        address: "",
-        args: [],
-        typeArgs: [],
-      });
-
-      await signAndExecuteTransaction({ transaction: txn });
-      toast.success("Transaction sent");
-    } else {
-      // mui pop up error tips
-      toast.error("Please connect your wallet first", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  };
-
   return (
     <main className="main">
       <h3>
@@ -71,9 +45,7 @@ export default function Main() {
             float: "right",
           }}
         >
-          <Button variant="outlined" onClick={handleCreateRepo}>
-            <AddIcon color="primary" />
-          </Button>
+          <CreateRepoDialog />
         </div>
         {repos && (
           <DataGrid
@@ -82,13 +54,27 @@ export default function Main() {
               let decode_value = repo.state.decoded_value.value.value.value;
               return {
                 id: repo.field_key,
-                repo_name: decode_value.repo_name,
+                repo_name: decode_value,
+                repo_url: decode_value.repo_url,
                 owner: decode_value.owner,
                 link: `commits/${decode_value.commits.value.contents.value.handle.value.id}`,
               };
             })}
             columns={[
-              { field: "repo_name", headerName: "Repo name", flex: 1 },
+              {
+                field: "repo_name",
+                headerName: "Repo name",
+                flex: 1,
+                renderCell: (params) => (
+                  <a
+                    href={params.value.repo_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {params.value.repo_name}
+                  </a>
+                ),
+              },
               { field: "owner", headerName: "Repo owner", flex: 2 },
               {
                 field: "link",

@@ -17,12 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Container
-          sx={{
-            padding: "2rem",
-          }}
-          maxWidth={"xl"}
-        >
+        <Container maxWidth={false} sx={{ padding: "2rem" }}>
           <AppWrapper>{children}</AppWrapper>
         </Container>
         <ToastContainer />
