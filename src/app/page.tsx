@@ -39,6 +39,7 @@ export default function Main() {
       </h3>
       <p>TableID : {tableID}</p>
       <div>
+        <DeveloperInfo />
         <div
           style={{
             marginBottom: "1rem",
@@ -47,6 +48,7 @@ export default function Main() {
         >
           <CreateRepoDialog />
         </div>
+
         {repos && (
           <DataGrid
             sx={{ width: "100%" }}

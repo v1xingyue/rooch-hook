@@ -10,16 +10,15 @@ const useDeveloper = (network: any, mypackage: string, address: String) => {
       });
 
       const resource = await client.getStates({
-        accessPath: `/resource/${mypackage}/${mypackage}::developer::Repos`,
+        accessPath: `/resource/${mypackage}/${address}::developer::DeveloperInfo`,
         stateOption: {
           decode: true,
         },
       });
 
       if (resource.length > 0) {
-        const v = resource[0].decoded_value?.value.value as any;
-        let table_id = v.value.repos.value.handle.value.id as string;
-        return table_id;
+        // const v = resource[0].decoded_value?.value.value as any;
+        return resource[0].decoded_value?.value.value as any;
       } else {
         console.log("No resource found");
         throw new Error("No resource found");
