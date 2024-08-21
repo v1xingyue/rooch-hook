@@ -26,7 +26,7 @@ const useRoochTableData = (
       }
     },
     enabled: !!tableId && !!network,
-    refetchInterval: 10000,
+    refetchInterval: 15_000,
   });
 };
 

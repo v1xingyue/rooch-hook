@@ -26,7 +26,7 @@ const useDeveloper = (network: any, mypackage: string, address: String) => {
       }
     },
     enabled: !!mypackage && !!network,
-    refetchInterval: 10000,
+    refetchInterval: 1000 * 1000,
   });
 };
 

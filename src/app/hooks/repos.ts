@@ -26,7 +26,7 @@ const useRepos = (network: any, mypackage: string) => {
       }
     },
     enabled: !!mypackage && !!network,
-    refetchInterval: 10000,
+    refetchInterval: 10 * 1000,
   });
 };
 

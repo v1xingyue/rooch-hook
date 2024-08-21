@@ -22,7 +22,8 @@ export const CreateRepoDialog = () => {
 
   const [open, setOpen] = React.useState(false);
   const session = useCurrentSession();
-  const mypackage = process.env.NEXT_PUBLIC_PACKAGE;
+  const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
+  console.log(`mypackage is ${mypackage}`);
   const { mutateAsync: signAndExecuteTransaction } =
     UseSignAndExecuteTransaction();
 
@@ -43,7 +44,7 @@ export const CreateRepoDialog = () => {
 
       let parts = repoUrlTmp.split("/");
       let repoName = parts[parts.length - 1];
-      console.log(repoName);
+      console.log(mypackage, repoName, repoUrlTmp);
 
       const txn = new Transaction();
       txn.callFunction({
@@ -51,12 +52,16 @@ export const CreateRepoDialog = () => {
         module: "developer",
         address: mypackage as string,
         args: [Args.string(repoUrlTmp), Args.string(repoName)],
-        typeArgs: [],
       });
 
-      await signAndExecuteTransaction({ transaction: txn });
-      toast.success("Transaction sent", toastOptions);
-      setOpen(false);
+      try {
+        await signAndExecuteTransaction({ transaction: txn });
+        toast.success("Transaction sent", toastOptions);
+      } catch (error) {
+        toast.error("Transaction failed" + error, toastOptions);
+      } finally {
+        setOpen(false);
+      }
     } else {
       // mui pop up error tips
       toast.error("Please init session first", toastOptions);
