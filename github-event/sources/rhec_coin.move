@@ -8,7 +8,7 @@ module github_event::rhec_coin {
     use rooch_framework::account_coin_store;
     use moveos_std::account;
     
-    const TOTAL_SUPPLY: u256 = 210_000_000_000u256;
+    const TOTAL_SUPPLY: u256 = 2_000_000_000_000u256;
     const DECIMALS: u8 = 3u8;
 
     const E_NO_BALANCE: u64 = 1;
