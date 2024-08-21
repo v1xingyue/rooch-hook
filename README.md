@@ -57,3 +57,7 @@ Also you should change the content-type to **application/json** .
 - rooch move view --function default::developer::test_verify
 
 ...
+
+### 5. coin distributions
+
+You will get some $RHEC coin when you push your commit to the rooch.
