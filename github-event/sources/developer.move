@@ -46,7 +46,9 @@ module github_event::developer {
 
     struct DeveloperInfo has key {
         name: String,
-        signer_pub: vector<u8>
+        signer_pub: vector<u8>,
+        register_time: u64,
+        last_active_time: u64,
     }
 
     struct AdminCap has key {}
@@ -69,7 +71,8 @@ module github_event::developer {
     }
 
     entry fun mint_developer(signer:&signer,name:String,signer_pub:vector<u8>){
-        account::move_resource_to(signer, DeveloperInfo { name,signer_pub});
+        let now = timestamp::now_seconds();
+        account::move_resource_to(signer, DeveloperInfo { name,signer_pub,register_time: now,last_active_time: now});
         trigger_event(EVENT_TYPE_MINT_DEVELOPER,signer::address_of(signer),name,0);
     }
 
