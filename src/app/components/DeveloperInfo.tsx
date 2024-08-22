@@ -20,7 +20,11 @@ const DeveloperInfo = () => {
     data: developerInfo,
     isLoading: isLoadingCommits,
     error: commitsError,
-  } = useDeveloper(network, mypackage, address?.toStr() as string);
+  } = useDeveloper(
+    network,
+    mypackage,
+    address?.genRoochAddress().toHexAddress() as any
+  );
   const [info, setInfo] = useState<any>({});
   const session = useCurrentSession();
   const { mutateAsync: signAndExecuteTransaction } =
@@ -70,12 +74,14 @@ const DeveloperInfo = () => {
             value={info.name}
             sx={{ width: "15%" }}
             onChange={(e) => setInfo({ ...info, name: e.target.value })}
+            InputLabelProps={{ shrink: true }}
           />
           <TextField
             label="Signer Public Key"
             value={info.signer_pub}
             sx={{ width: "55%", marginLeft: "1rem" }}
             onChange={(e) => setInfo({ ...info, signer_pub: e.target.value })}
+            InputLabelProps={{ shrink: true }}
           />
 
           <LoadingButton

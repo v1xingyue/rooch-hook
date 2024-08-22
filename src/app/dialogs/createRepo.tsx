@@ -23,7 +23,6 @@ export const CreateRepoDialog = () => {
   const [open, setOpen] = React.useState(false);
   const session = useCurrentSession();
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
-  console.log(`mypackage is ${mypackage}`);
   const { mutateAsync: signAndExecuteTransaction } =
     UseSignAndExecuteTransaction();
 

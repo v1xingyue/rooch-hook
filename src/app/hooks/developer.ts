@@ -5,6 +5,7 @@ const useDeveloper = (network: any, mypackage: string, address: string) => {
   return useQuery({
     queryKey: ["developer-info", mypackage, network, address],
     queryFn: async () => {
+      console.log("query developer info ", mypackage, network, address);
       const client = new RoochClient({
         url: getRoochNodeUrl(network as any),
       });
@@ -16,6 +17,8 @@ const useDeveloper = (network: any, mypackage: string, address: string) => {
         },
       });
 
+      console.log(resource);
+
       if (resource.length > 0) {
         // const v = resource[0].decoded_value?.value.value as any;
         return resource[0].decoded_value?.value.value as any;
@@ -24,8 +27,8 @@ const useDeveloper = (network: any, mypackage: string, address: string) => {
         throw new Error("No resource found");
       }
     },
-    enabled: !!mypackage && !!network && !!address,
-    refetchInterval: 1000 * 1000,
+    enabled: true,
+    refetchInterval: 3000,
   });
 };
 

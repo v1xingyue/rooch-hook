@@ -7,7 +7,8 @@
     "update_pub": "ts-node src/update_pub.ts",
     "create_repo": "ts-node src/create_repo.ts",
     "items": "ts-node src/items.ts",
-    "keys": "ts-node src/keys.ts"
+    "keys": "ts-node src/keys.ts",
+    "info": "ts-node src/info.ts"
   },
   "keywords": [],
   "author": "",
