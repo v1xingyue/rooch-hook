@@ -21,8 +21,10 @@ export const POST = async (
   const result = await client.transfer({
     signer: pair,
     recipient: params.address,
-    amount: BigInt(3000_000_000),
-    coinType: "0x3::gas_coin::GasCoin" as any,
+    amount: BigInt(1_000_000),
+    coinType: {
+      target: "0x3::gas_coin::GasCoin",
+    },
   });
 
   return Response.json({
