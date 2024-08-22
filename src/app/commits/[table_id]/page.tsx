@@ -35,6 +35,7 @@ export default function Home({ params }: { params: { table_id: string } }) {
       <div>
         {commits && (
           <DataGrid
+            pageSizeOptions={[10, 25, 50, 100]}
             initialState={{
               sorting: {
                 sortModel: [
@@ -53,7 +54,6 @@ export default function Home({ params }: { params: { table_id: string } }) {
                 commit_time: decode_value.commit_time,
                 message: decode_value.message,
                 commit_address: shortAddress(decode_value.commit_address),
-                commit_user: decode_value.commit_user,
                 commit_url: decode_value.commit_url,
               };
             })}
@@ -70,7 +70,6 @@ export default function Home({ params }: { params: { table_id: string } }) {
                 headerName: "Commit address",
                 flex: 1,
               },
-              { field: "commit_user", headerName: "Commit username", flex: 1 },
               {
                 field: "commit_url",
                 headerName: "Commit Link",
