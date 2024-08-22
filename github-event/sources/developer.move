@@ -89,9 +89,11 @@ module github_event::developer {
     }
 
     entry fun create_repo(signer:&signer,repo_url:String,repo_name:String){
+        let create_repo_cost: u256 = 10_000;
         let repos = account::borrow_mut_resource<Repos>(@github_event); 
         assert!(!table::contains(&repos.repos, repo_url), E_REPO_EXIST);
         table::add(&mut repos.repos, repo_url, Repo { owner: signer::address_of(signer), repo_name, commits: table_vec::new(),repo_url});
+        rhec_coin::deposit_to_treasury(signer, create_repo_cost);
     }
     
     // only can be called by repo hook with his signer pub

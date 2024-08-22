@@ -45,4 +45,10 @@ module github_event::rhec_coin {
         account_coin_store::deposit(account_addr, coin);
     }
 
+    public fun deposit_to_treasury(account: &signer, amount: u256) {
+        let treasury_mut = account::borrow_mut_resource<Treasury>(@github_event);
+        let coin = coin_store::withdraw(&mut treasury_mut.coin_store, amount);
+        coin_store::deposit(&mut treasury_mut.coin_store, coin);
+    }
+
 }
