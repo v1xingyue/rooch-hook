@@ -14,16 +14,18 @@ export const POST = async (
   console.log(`rpc url is ${url}`);
   const pair = Secp256k1Keypair.fromSecretKey(process.env.PRIVATE_KEY!);
 
-  const tx = new Transaction();
-  tx.callFunction({
-    contractAddress: "0x0000000000000000000000000000000000000000",
-  });
-
   const client = new RoochClient({
     url,
   });
 
+  const result = await client.transfer({
+    signer: pair,
+    recipient: params.address,
+    amount: BigInt(3000_000_000),
+    coinType: "0x3::gas_coin::GasCoin" as any,
+  });
+
   return Response.json({
-    address: params.address,
+    result,
   });
 };

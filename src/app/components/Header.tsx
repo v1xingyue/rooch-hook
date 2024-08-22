@@ -102,7 +102,7 @@ const Header = () => {
                     <Chip
                       label={`${coin.balance / 10 ** coin.decimals} $${
                         coin.symbol
-                      }`}
+                      } `}
                       color="primary"
                     />
                   </li>
