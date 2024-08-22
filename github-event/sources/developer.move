@@ -9,12 +9,32 @@ module github_event::developer {
     use rooch_framework::ed25519;
     use moveos_std::hex;
     use github_event::rhec_coin;
+    use moveos_std::event;
     
-
     const E_REPO_EXIST : u64 = 1;
     const E_REPO_NOT_EXIST : u64 = 2;
     const E_COMMIT_VERIFY_FAILED: u64 = 3;
     const E_HOOK_NOT_REPO_OWNER: u64 = 4;
+
+    const EVENT_TYPE_COMMIT: u8 = 1;
+    const EVENT_TYPE_MINT_DEVELOPER : u8 = 2;
+    const EVENT_TYPE_UPDATE_DEVELOPER : u8 = 3;
+
+    struct DeveloperEvent has drop,copy {
+        event_type: u8,
+        address: address,
+        msg: String,
+        rhec_value: u64
+    }
+
+    fun trigger_event(event_type: u8,address: address,msg: String,rhec_value: u64) {
+        event::emit(DeveloperEvent{
+            event_type,
+            address,
+            msg,
+            rhec_value
+        });
+    }
 
     struct Commit has store {
         commit_address: address,
@@ -50,12 +70,14 @@ module github_event::developer {
 
     entry fun mint_developer(signer:&signer,name:String,signer_pub:vector<u8>){
         account::move_resource_to(signer, DeveloperInfo { name,signer_pub});
+        trigger_event(EVENT_TYPE_MINT_DEVELOPER,signer::address_of(signer),name,0);
     }
 
     entry fun update_developer_info(signer:&signer,name:String,signer_pub:vector<u8>){
         let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
         dev_info.name = name;
         dev_info.signer_pub = signer_pub;
+        trigger_event(EVENT_TYPE_UPDATE_DEVELOPER,signer::address_of(signer),name,0);
     }
 
     entry fun update_or_mint(signer:&signer,name:String,signer_pub:vector<u8>){
