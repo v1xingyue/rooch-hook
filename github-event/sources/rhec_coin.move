@@ -5,13 +5,14 @@ module github_event::rhec_coin {
     use moveos_std::object::{Self, Object};
     use rooch_framework::coin;
     use rooch_framework::coin_store::{Self, CoinStore,balance};
-    use rooch_framework::account_coin_store;
+    use rooch_framework::account_coin_store::{Self};
     use moveos_std::account;
     
     const TOTAL_SUPPLY: u256 = 2_000_000_000_000u256;
     const DECIMALS: u8 = 3u8;
 
     const E_NO_BALANCE: u64 = 1;
+    const E_NOT_ENOUGH_BALANCE: u64 = 2;
     
     struct RHEC has key, store {}
     struct Treasury has key {
@@ -46,9 +47,10 @@ module github_event::rhec_coin {
     }
 
     public fun deposit_to_treasury(account: &signer, amount: u256) {
+        assert!(account_coin_store::balance<RHEC>(signer::address_of(account)) >= amount, E_NOT_ENOUGH_BALANCE);
+        let user_coin = account_coin_store::withdraw<RHEC>(account,amount);
         let treasury_mut = account::borrow_mut_resource<Treasury>(@github_event);
-        let coin = coin_store::withdraw(&mut treasury_mut.coin_store, amount);
-        coin_store::deposit(&mut treasury_mut.coin_store, coin);
+        coin_store::deposit(&mut treasury_mut.coin_store, user_coin);
     }
 
 }
