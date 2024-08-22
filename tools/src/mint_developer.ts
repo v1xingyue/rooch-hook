@@ -24,18 +24,20 @@ const main = async () => {
 
   const pair = Secp256k1Keypair.fromSecretKey(privateKey);
   console.log(`rooch address is ${pair.getRoochAddress().toStr()}`);
-  const package_address = pair.getRoochAddress().toHexAddress();
+  const package_address = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS as string;
   console.log(`package address is ${package_address}`);
 
   const balance = await client.getBalance({
     owner: pair.getRoochAddress().toStr(),
     coinType: "0x3::gas_coin::GasCoin",
   });
-  console.log(`current balance is ${balance} `);
+  console.log(`current balance is ${JSON.stringify(balance)} `);
+
+  console.log(`sender address is ${pair.getRoochAddress().toHexAddress()} `);
 
   const mint_tx = new Transaction();
   mint_tx.callFunction({
-    target: `${package_address}::developer::mint_developer`,
+    target: `${package_address}::developer::update_or_mint`,
     args: [
       Args.string("v1xingyue"),
       Args.vec(
@@ -52,7 +54,12 @@ const main = async () => {
     signer: pair,
   });
 
-  console.log(submit);
+  console.log(JSON.stringify(submit));
+
+  const events = await client.getEvents({
+    eventHandleType: `${package_address}::developer::DeveloperEvent`,
+  });
+  console.log(JSON.stringify(events));
 };
 
 main().then(null).catch(null);

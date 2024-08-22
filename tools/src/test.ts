@@ -23,7 +23,8 @@ const main = async () => {
 
   const pair = Secp256k1Keypair.fromSecretKey(privateKey);
   console.log(`rooch address is ${pair.getRoochAddress().toStr()}`);
-  const package_address = pair.getRoochAddress().toHexAddress();
+
+  const package_address = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS as string;
   console.log(`package address is ${package_address}`);
 
   const balance = await client.getBalance({

@@ -11,7 +11,7 @@ const useDeveloper = (network: any, mypackage: string, address: string) => {
       });
 
       const resource = await client.getStates({
-        accessPath: `/resource/${mypackage}/${address}::developer::DeveloperInfo`,
+        accessPath: `/resource/${address}/${mypackage}::developer::DeveloperInfo`,
         stateOption: {
           decode: true,
         },

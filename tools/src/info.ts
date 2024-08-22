@@ -14,22 +14,23 @@ dotenv.config({
 });
 
 const main = async () => {
+  const privateKey = process.env.PRIVATE_KEY as string;
   const network = process.env.NEXT_PUBLIC_ROOCH_NETWORK as string;
   const url = getRoochNodeUrl(process.env.NEXT_PUBLIC_NETWORK as any);
   console.log(url);
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS as string;
-  const address =
-    "0xe42e88f0e87f799450c27e07d7d7d31ba0c379e007e6bdcfeb66964784360006";
-
   const client = new RoochClient({ url });
 
+  const pair = Secp256k1Keypair.fromSecretKey(privateKey);
+  const address = pair.getRoochAddress().toHexAddress();
+
   const info = await client.getStates({
-    accessPath: `/resource/${mypackage}/${address}::developer::DeveloperInfo`,
+    accessPath: `/resource/${address}/${mypackage}::developer::DeveloperInfo`,
     stateOption: {
       decode: true,
     },
   });
-  console.log(info);
+  console.log(JSON.stringify(info, null, 2));
 };
 
 main()

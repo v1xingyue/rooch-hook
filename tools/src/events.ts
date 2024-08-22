@@ -33,25 +33,13 @@ const main = async () => {
   });
   console.log(`current balance is ${balance} `);
 
-  const mint_tx = new Transaction();
-  mint_tx.callFunction({
-    target: `${package_address}::developer::update_pub`,
-    args: [
-      Args.vec(
-        "u8",
-        fromHEX(
-          "2ced5724e6a52224d32491840cc0c121b1d486e5629f5926b753909e956be77c"
-        ) as any
-      ),
-    ],
+  const events = await client.getEvents({
+    eventHandleType: `${package_address}::developer::DeveloperEvent`,
+    eventOptions: {
+      decode: true,
+    },
   });
-
-  const submit = await client.signAndExecuteTransaction({
-    transaction: mint_tx,
-    signer: pair,
-  });
-
-  console.log(submit);
+  console.log(JSON.stringify(events));
 };
 
 main().then(null).catch(null);
