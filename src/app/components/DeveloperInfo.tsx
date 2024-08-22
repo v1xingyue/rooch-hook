@@ -1,6 +1,5 @@
 import {
   useCurrentAddress,
-  useCurrentNetwork,
   useCurrentSession,
   UseSignAndExecuteTransaction,
 } from "@roochnetwork/rooch-sdk-kit";
@@ -13,20 +12,25 @@ import { toast } from "react-toastify";
 import { toastOptions } from "../config";
 
 const DeveloperInfo = () => {
-  const network = useCurrentNetwork();
+  const network = process.env.NEXT_PUBLIC_NETWORK;
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS as string;
   const [isLoading, setIsLoading] = useState(false);
+  const address = useCurrentAddress();
   const {
     data: developerInfo,
     isLoading: isLoadingCommits,
     error: commitsError,
-  } = useDeveloper(network, mypackage, mypackage);
+  } = useDeveloper(network, mypackage, address?.toStr() as string);
   const [info, setInfo] = useState<any>({});
   const session = useCurrentSession();
   const { mutateAsync: signAndExecuteTransaction } =
     UseSignAndExecuteTransaction();
 
   const updateDeveloperInfo = async () => {
+    if (!session) {
+      toast.error("Please login to update developer info", toastOptions);
+      return;
+    }
     setIsLoading(true);
     const tx = new Transaction();
     tx.callFunction({
@@ -59,7 +63,7 @@ const DeveloperInfo = () => {
 
   return (
     <Container maxWidth={false}>
-      {developerInfo && (
+      {
         <div style={{ display: "flex", alignItems: "center" }}>
           <TextField
             label="Name"
@@ -84,10 +88,10 @@ const DeveloperInfo = () => {
               await updateDeveloperInfo();
             }}
           >
-            Update Developer Info
+            {developerInfo ? "Update Developer Info" : "Mint Developer Info"}
           </LoadingButton>
         </div>
-      )}
+      }
     </Container>
   );
 };

@@ -4,18 +4,11 @@ import { DataGrid } from "@mui/x-data-grid";
 import useRepos from "./hooks/repos";
 import useRoochTableData from "./hooks/tables";
 import DeveloperInfo from "./components/DeveloperInfo";
-import { Transaction } from "@roochnetwork/rooch-sdk";
-import {
-  useCurrentSession,
-  UseSignAndExecuteTransaction,
-} from "@roochnetwork/rooch-sdk-kit";
-import { toast } from "react-toastify"; // Add this import
+import { UseSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
 import React from "react";
-import { toastOptions } from "./config";
 import { CreateRepoDialog } from "./dialogs/createRepo";
 
 export default function Main() {
-  const session = useCurrentSession();
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
   const network = process.env.NEXT_PUBLIC_NETWORK;
   const {
@@ -35,7 +28,7 @@ export default function Main() {
   return (
     <main className="main">
       <h3>
-        Github Commit List: {mypackage} on {network}
+        Contract Address : {mypackage} on {network}
       </h3>
       <p>TableID : {tableID}</p>
       <div>

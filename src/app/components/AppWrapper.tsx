@@ -14,12 +14,14 @@ const AppWrapper = ({
 }>) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <RoochProvider networks={networkConfig} defaultNetwork="testnet">
+      <RoochProvider
+        networks={networkConfig}
+        defaultNetwork="testnet"
+        onNetworkChange={(e) => console.log(e)}
+      >
         <WalletProvider chain={"bitcoin"} autoConnect>
-          <>
-            <Header />
-            {children}
-          </>
+          <Header />
+          {children}
         </WalletProvider>
       </RoochProvider>
     </QueryClientProvider>

@@ -1,7 +1,7 @@
 import { getRoochNodeUrl, RoochClient } from "@roochnetwork/rooch-sdk";
 import { useQuery } from "@tanstack/react-query";
 
-const useDeveloper = (network: any, mypackage: string, address: String) => {
+const useDeveloper = (network: any, mypackage: string, address: string) => {
   return useQuery({
     queryKey: ["developer-info", mypackage, network, address],
     queryFn: async () => {
@@ -24,7 +24,7 @@ const useDeveloper = (network: any, mypackage: string, address: String) => {
         throw new Error("No resource found");
       }
     },
-    enabled: !!mypackage && !!network,
+    enabled: !!mypackage && !!network && !!address,
     refetchInterval: 1000 * 1000,
   });
 };
