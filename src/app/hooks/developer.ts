@@ -27,8 +27,8 @@ const useDeveloper = (network: any, mypackage: string, address: string) => {
         throw new Error("No resource found");
       }
     },
-    enabled: true,
-    refetchInterval: 3000,
+    enabled: !!mypackage && !!network && !!address,
+    refetchInterval: 20_000,
   });
 };
 
