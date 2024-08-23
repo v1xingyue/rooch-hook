@@ -19,6 +19,7 @@ const useRoochTableData = (
             decode: true,
             showDisplay: false,
           },
+          limit: "10000",
         });
         return commits.data as any[];
       } else {
