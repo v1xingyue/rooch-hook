@@ -4,11 +4,16 @@ import { DataGrid } from "@mui/x-data-grid";
 import useRepos from "./hooks/repos";
 import useRoochTableData from "./hooks/tables";
 import DeveloperInfo from "./components/DeveloperInfo";
-import { UseSignAndExecuteTransaction } from "@roochnetwork/rooch-sdk-kit";
+import {
+  useCurrentAddress,
+  UseSignAndExecuteTransaction,
+} from "@roochnetwork/rooch-sdk-kit";
 import React from "react";
 import { CreateRepoDialog } from "./dialogs/createRepo";
+import { Chip, Paper, Typography } from "@mui/material";
 
 export default function Main() {
+  const address = useCurrentAddress();
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
   const network = process.env.NEXT_PUBLIC_NETWORK;
   const {
@@ -27,10 +32,12 @@ export default function Main() {
 
   return (
     <main className="main">
-      <h3>
-        Contract Address : {mypackage} on {network}
-      </h3>
-      <p>TableID : {tableID}</p>
+      <Paper sx={{ padding: "1rem", margin: "1rem" }}>
+        <Typography>
+          <p>Contract: {mypackage}</p>
+          <p>Rooch Address : {address?.genRoochAddress().toHexAddress()}</p>
+        </Typography>
+      </Paper>
       <div>
         <DeveloperInfo />
         <div

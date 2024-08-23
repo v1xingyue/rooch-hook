@@ -111,7 +111,8 @@ module github_event::developer {
 
         if (rhec_coin::get_treasury_balance() > 0) {
             rhec_coin::mint_to(signer, 1000);
-            // let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
+            let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
+            dev_info.last_active_time = timestamp::now_seconds();
         };
     }
 

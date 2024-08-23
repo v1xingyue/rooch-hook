@@ -66,7 +66,7 @@ const DeveloperInfo = () => {
   }, [developerInfo]);
 
   return (
-    <Container maxWidth={false}>
+    <Container maxWidth={false} sx={{ marginTop: "1rem" }}>
       {
         <div style={{ display: "flex", alignItems: "center" }}>
           <TextField

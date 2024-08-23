@@ -4,13 +4,21 @@
 
 ## How to use rooch hook
 
-### 1. install sign-tool
+### 1. install sign-tool & init signer
+
+#### install sign-tool
 
 ```shell
 cargo install --git https://github.com/v1xingyue/rooch-hook.git --branch  main
 ```
 
-put your hook content to **.git/hooks/prepare-commit-msg**:
+#### init signer
+
+```shell
+sign-tool init --address $your_rooch_hex_address
+```
+
+#### put your hook content to **.git/hooks/prepare-commit-msg**
 
 ```shell
 cat > .git/hooks/prepare-commit-msg << 'EOF'
