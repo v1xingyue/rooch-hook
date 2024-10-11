@@ -4,7 +4,7 @@ import { shortAddress } from "@/app/components/util";
 import useRoochTableData from "@/app/hooks/tables";
 import { DataGrid } from "@mui/x-data-grid";
 
-export const Home = ({ params }: { params: { table_id: string } }) => {
+const Home = ({ params }: { params: { table_id: string } }) => {
   const { table_id } = params;
 
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -84,3 +84,5 @@ export const Home = ({ params }: { params: { table_id: string } }) => {
     </>
   );
 };
+
+export default Home;
