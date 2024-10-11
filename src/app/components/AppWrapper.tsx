@@ -16,7 +16,7 @@ const AppWrapper = ({
     <QueryClientProvider client={queryClient}>
       <RoochProvider
         networks={networkConfig}
-        defaultNetwork="testnet"
+        defaultNetwork={process.env.NEXT_PUBLIC_NETWORK as keyof typeof networkConfig}
         onNetworkChange={(e) => console.log(e)}
       >
         <WalletProvider chain={"bitcoin"} autoConnect>

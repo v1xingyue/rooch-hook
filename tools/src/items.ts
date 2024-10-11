@@ -24,28 +24,18 @@ const main = async () => {
   const package_address = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS as string;
   console.log(`package address is ${package_address}`);
 
-  const resource = await client.getStates({
-    accessPath: `/resource/${package_address}/${package_address}::developer::DeveloperInfo`,
+  let table_id =
+    "0x59a2384059899f8458d0febadf68c56c7380e4b9a1bfb8d37ffc7d4568640d99";
+  console.log(`commits table id is ${table_id}`);
+  const commits = await client.listStates({
+    accessPath: `/table/${table_id}`,
     stateOption: {
       decode: true,
+      showDisplay: false,
     },
+    limit: "10000",
   });
-
-  if (resource.length === 0) {
-    console.log(`no resource found`);
-  } else {
-    const v = resource[0].decoded_value?.value.value as any;
-    let table_id = v.value.commits.value.contents.value.handle.value.id;
-    console.log(`commits table id is ${table_id}`);
-    const commits = await client.listStates({
-      accessPath: `/table/${table_id}`,
-      stateOption: {
-        decode: true,
-        showDisplay: false,
-      },
-    });
-    console.log(JSON.stringify(commits, null, 2));
-  }
+  console.log(JSON.stringify(commits, null, 2));
 };
 
 main().then(null).catch(null);

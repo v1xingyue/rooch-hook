@@ -2,18 +2,9 @@
 
 import { shortAddress } from "@/app/components/util";
 import useRoochTableData from "@/app/hooks/tables";
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
-export default function Home({ params }: { params: { table_id: string } }) {
+export const Home = ({ params }: { params: { table_id: string } }) => {
   const { table_id } = params;
 
   const mypackage = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
@@ -92,4 +83,4 @@ export default function Home({ params }: { params: { table_id: string } }) {
       </div>
     </>
   );
-}
+};

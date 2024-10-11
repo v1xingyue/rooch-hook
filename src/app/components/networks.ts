@@ -3,6 +3,9 @@ import { createNetworkConfig } from "@roochnetwork/rooch-sdk-kit";
 
 const { networkConfig, useNetworkVariable, useNetworkVariables } =
   createNetworkConfig({
+    mainnet: {
+      url: getRoochNodeUrl("mainnet"),
+    },
     testnet: {
       url: getRoochNodeUrl("testnet"),
     },

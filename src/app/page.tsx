@@ -34,6 +34,7 @@ export default function Main() {
     <main className="main">
       <Paper sx={{ padding: "1rem", margin: "1rem" }}>
         <Typography>
+          <p>Network: {network}</p>
           <p>Contract: {mypackage}</p>
           <p>Rooch Address : {address?.genRoochAddress().toHexAddress()}</p>
         </Typography>
