@@ -1,5 +1,6 @@
 module github_event::rhec_coin {
 
+    use std::option;
     use std::string;
     use moveos_std::signer;
     use moveos_std::object::{Self, Object};
@@ -23,6 +24,7 @@ module github_event::rhec_coin {
         let coin_info_obj = coin::register_extend<RHEC>(    
             string::utf8(b"Rooch Hook Event Coin"),
             string::utf8(b"RHEC"),
+            option::some(string::utf8(b"https://github.com/v1xingyue/rooch-hook/blob/main/icon/image.png?raw=true")),
             DECIMALS,
         );
         let coin = coin::mint_extend<RHEC>(&mut coin_info_obj, TOTAL_SUPPLY);
