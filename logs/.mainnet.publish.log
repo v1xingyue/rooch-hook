@@ -1,0 +1,70 @@
+Publish modules to address: 726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b
+Execution info:
+    status: Executed
+    gas used: 4141352
+    tx hash: 0xa22dd948e9bf206b652eedb7dc69fc543c529376278db6c4d2e42f7f8e7ad742
+    state root: 0xcfc9b3fe6299b561950b4a21df3cc444a6f6b920fcf57036ad7530cadff977f6
+    event root: 0xe65614836ad484d3a484b2c9487f2b8a45cd28b6c246ecbb18941b2ca63df31e
+
+New modules:
+    0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::rhec_coin
+    0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::developer
+
+Updated modules:
+    None
+
+New objects:
+    objectId: 0x14481947570f6c2f50d190f9a13bf549ab2f0c9debc41296cd4d506002379659726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b
+    type    : 0x2::module_store::Package
+
+    objectId: 0x14481947570f6c2f50d190f9a13bf549ab2f0c9debc41296cd4d506002379659726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b53f8e3452fe45009f0ede73f97eda6e5f38137096eac4679d2a7f892ceee4507
+    type    : 0x2::object::DynamicField<0x1::string::String, 0x2::move_module::MoveModule>
+
+    objectId: 0x14481947570f6c2f50d190f9a13bf549ab2f0c9debc41296cd4d506002379659726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9bc24f9e6f8025c1384c780257e6df14b1947b850e8966e0a73490497d45707239
+    type    : 0x2::object::DynamicField<0x1::string::String, 0x2::move_module::MoveModule>
+
+    objectId: 0x2ec24e80179f353555d1012f896a708dcf1f441ffb4131413af0cb245510e721f316a3ab09e0acfde8d81f4f1c3c1269412a891d8b936ab0c2d57283b71a9724
+    type    : 0x2::object::DynamicField<address, 0x3::bitcoin_address::BitcoinAddress>
+
+    objectId: 0x54357e7e33db7cb60f09144af980537cae24ded4942b0e72e4d00df8fdcbe367
+    type    : 0x3::coin::CoinInfo<0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::rhec_coin::RHEC>
+
+    objectId: 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b
+    type    : 0x2::account::Account
+
+    objectId: 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b0d7c5c29bfa1d0c1d76b619ee5486edec04841368cc667fa7cb57c550c431716
+    type    : 0x2::object::DynamicField<0x1::string::String, 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::rhec_coin::Treasury>
+
+    objectId: 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b1c49fe127c8f7472ea61936efa45044977f549c4fc6cbf8fbe640bb5bb9f227c
+    type    : 0x2::object::DynamicField<0x1::string::String, 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::developer::Repos>
+
+    objectId: 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9bdb5292c44b4d9a5728f33981f7ad1f48fed98b909f1a72068786e2f6e9def66d
+    type    : 0x2::object::DynamicField<0x1::string::String, 0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::developer::AdminCap>
+
+    objectId: 0x77caec87955debf784f8d20e6b22938f446c61ae317727e13c0d2d263abf192d
+    type    : 0x2::module_store::UpgradeCap
+
+    objectId: 0x946f554d3f8c5bcd357569d6ca0513f8612d3d0de9b3ad6e7bb32fdd3d3a4664
+    type    : 0x3::coin_store::CoinStore<0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::rhec_coin::RHEC>
+
+    objectId: 0xd39ee162f4a8ae27d252ec196347db9b4a1f079d915bbd398e93bece051a2784
+    type    : 0x2::table::TablePlaceholder
+            
+Modified objects:
+    objectId: 0x14481947570f6c2f50d190f9a13bf549ab2f0c9debc41296cd4d506002379659
+    type    : 0x2::module_store::ModuleStore
+
+    objectId: 0x2ec24e80179f353555d1012f896a708dcf1f441ffb4131413af0cb245510e721
+    type    : 0x3::address_mapping::RoochToBitcoinAddressMapping
+
+    objectId: 0x3a7dfe7a9a5cd608810b5ebd60c7adf7316667b17ad5ae703af301b74310bcca
+    type    : 0x2::timestamp::Timestamp
+
+    objectId: 0xd287903df31ce2df68fd9fd967d22ee8475b11a8cc896c4e3a6d99eb58f95a05
+    type    : 0x3::coin_store::CoinStore<0x3::gas_coin::RGas>
+
+    objectId: 0xea460447fb1d17836556cfd86f6c97dea5d066d9ba802ae65e10a333f7396c76
+    type    : 0x3::coin_store::CoinStore<0x3::gas_coin::RGas>
+
+Removed objects:
+    None
