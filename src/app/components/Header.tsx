@@ -15,7 +15,6 @@ import {
   Chip,
   Container,
   Link,
-  Stack,
   Toolbar,
 } from "@mui/material";
 import { useState } from "react";
@@ -79,11 +78,50 @@ const Header = () => {
         <Toolbar>
           <Link
             href="/"
-            style={{ textDecoration: "none", fontWeight: "bold" }}
-            sx={{ flexGrow: 1 }}
+            style={{
+              textDecoration: "none",
+              fontWeight: "bold",
+              fontSize: "1.5rem",
+              color: "#1976d2",
+              textShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)",
+              marginRight: "2rem", // Add space to the right
+            }}
           >
             Rooch Hooks
           </Link>
+
+          <Link
+            color="primary"
+            href="/"
+            sx={{
+              marginLeft: "1rem",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              color: "#1976d2",
+              '&:hover': {
+                color: "#004ba0",
+              },
+            }}
+          >
+            Home
+          </Link>
+          <Link
+            color="primary"
+            href="/swap"
+            sx={{
+              marginLeft: "1rem",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              color: "#1976d2",
+              '&:hover': {
+                color: "#004ba0",
+              },
+            }}
+          >
+            Swap
+          </Link>
+
+          <Box sx={{ flexGrow: 1 }} /> {/* Spacer to push the rest to the right */}
 
           {coinBalance && coinBalance.length > 0 ? (
             <Box sx={{ marginRight: "1rem" }}>

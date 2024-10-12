@@ -10,7 +10,7 @@ import {
 } from "@roochnetwork/rooch-sdk-kit";
 import React from "react";
 import { CreateRepoDialog } from "./dialogs/createRepo";
-import { Chip, Paper, Typography } from "@mui/material";
+import { Link, Paper, Typography } from "@mui/material";
 
 export default function Main() {
   const address = useCurrentAddress();
@@ -69,13 +69,9 @@ export default function Main() {
                 headerName: "Repo name",
                 flex: 1,
                 renderCell: (params) => (
-                  <a
-                    href={params.value.repo_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Link href={params.value.repo_url}>
                     {params.value.repo_name}
-                  </a>
+                  </Link>
                 ),
               },
               { field: "owner", headerName: "Repo owner", flex: 2 },
@@ -84,13 +80,9 @@ export default function Main() {
                 headerName: "Link",
                 flex: 1,
                 renderCell: (params) => (
-                  <a
-                    href={params.value}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Link href={params.value} >
                     Commits
-                  </a>
+                  </Link>
                 ),
               },
             ]}
