@@ -12,4 +12,16 @@ rooch move run --function default::developer::assign_repo \
     --args "String:https://github.com/v1xingyue/rooch-hook-example" \
     --args "address:0x0e30025ccfcb7c5c786c2c54aec588edcf26e699bfa6244dffbe5f7b97d11f48" 
     
-    
+
+rooch move view --function default::developer::allow_commit --args address:0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b --args address:0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b
+
+rooch move run --function default::swap::init_pool \
+    --type-args "0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::rhec_coin::RHEC" \
+    --type-args "0x3::gas_coin::RGas" \
+    --args "u256:2000" \
+    --args "u256:2000" 
+
+rooch move run --function default::swap::swap \
+    --type-args "0x726b3e4cdbcd2e0cd0d5916bc3f8ce0970760e3d048b5ab0e84766c68a72fb9b::rhec_coin::RHEC" \
+    --type-args "0x3::gas_coin::RGas" \
+    --args "u256:100" 
