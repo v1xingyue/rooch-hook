@@ -92,8 +92,8 @@ export const POST = async (req: Request) => {
         results.push(result);
       }
     } catch (error) {
-      return Response.json({ error, params });
+      return Response.json({ error, params, data });
     }
   }
-  return Response.json({ results });
+  return Response.json({ results, data });
 };
