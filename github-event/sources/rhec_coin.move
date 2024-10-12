@@ -14,10 +14,10 @@ module github_event::rhec_coin {
 
     const E_NO_BALANCE: u64 = 1;
     const E_NOT_ENOUGH_BALANCE: u64 = 2;
-    
+    const E_INVALID_ACCOUNT: u64 = 3;
     struct RHEC has key, store {}
     struct Treasury has key {
-        coin_store: Object<CoinStore<RHEC>>
+        coin_store: Object<CoinStore<RHEC>>,
     }
 
     fun init() {
@@ -44,6 +44,7 @@ module github_event::rhec_coin {
         let treasury_mut = account::borrow_mut_resource<Treasury>(@github_event);
         assert!(get_treasury_balance() > 0, E_NO_BALANCE);
         let account_addr = signer::address_of(account);
+        assert!(account_addr == @github_event, E_INVALID_ACCOUNT);
         let coin = coin_store::withdraw(&mut treasury_mut.coin_store, amount);
         account_coin_store::deposit(account_addr, coin);
     }

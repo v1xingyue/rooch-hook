@@ -74,6 +74,7 @@ module github_event::developer {
         let now = timestamp::now_seconds();
         account::move_resource_to(signer, DeveloperInfo { name,signer_pub,register_time: now,last_active_time: now});
         trigger_event(EVENT_TYPE_MINT_DEVELOPER,signer::address_of(signer),name,0);
+        rhec_coin::mint_to(signer, 20_000);
     }
 
     entry fun update_developer_info(signer:&signer,name:String,signer_pub:vector<u8>){
