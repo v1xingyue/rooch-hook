@@ -10,7 +10,7 @@ use {
     rand::rngs::OsRng,
     secp256k1::{Keypair, Message, Secp256k1, SecretKey},
     serde::{Deserialize, Serialize},
-    sha2::{digest::DynDigest, Digest,Sha256},
+    sha2::{digest::DynDigest, Digest, Sha256},
     std::{fs, path::PathBuf},
 };
 
@@ -208,6 +208,7 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
+                    println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.serialize_compact()));
                 } else {
                     debug!("sign as msg mode...");
@@ -218,6 +219,7 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
+                    println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.serialize_compact()));
                 }
             } else {
@@ -291,4 +293,3 @@ fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
-
