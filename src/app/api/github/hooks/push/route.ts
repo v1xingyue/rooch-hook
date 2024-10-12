@@ -2,6 +2,7 @@
 
 import {
   Args,
+  CallFunctionArgs,
   RoochClient,
   Secp256k1Keypair,
   Transaction,
@@ -72,18 +73,7 @@ export const POST = async (req: Request) => {
         };
 
         const tx = new Transaction();
-        tx.callFunction({
-          target: `${packageAddress}::developer::commit`,
-          args: [
-            Args.address(parsed.commitAddress),
-            Args.string(repo_url),
-            Args.string(commit_url),
-            Args.string(parsed.messageBody),
-            Args.string(commit_user),
-            Args.string(parsed.msg_signate),
-            Args.string(parsed.msg_hash),
-          ],
-        });
+        tx.callFunction(params as CallFunctionArgs);
 
         const result = await client.signAndExecuteTransaction({
           transaction: tx,
@@ -92,8 +82,8 @@ export const POST = async (req: Request) => {
         results.push(result);
       }
     } catch (error) {
-      return Response.json({ error, params, data });
+      return Response.json({ error, params, commit });
     }
   }
-  return Response.json({ results, data });
+  return Response.json({ results });
 };
