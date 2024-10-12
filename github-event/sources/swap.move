@@ -10,6 +10,7 @@ module github_event::swap {
 
     const ERR_POOL_EXISTS: u64 = 1;
     const ERR_POOL_NOT_EXISTS: u64 = 2;
+    const E_INVALID_ACCOUNT: u64 = 3;
 
     struct Pool<phantom CoinTypeA: key + store, phantom CoinTypeB: key + store> has key {
         coin_a_store: Object<CoinStore<CoinTypeA>>,
@@ -17,6 +18,8 @@ module github_event::swap {
     }
 
     public entry fun init_pool<CoinTypeA: key + store, CoinTypeB: key + store>(sender: &signer,amount_a: u256, amount_b: u256) {
+        let account_addr = signer::address_of(sender);
+        assert!(account_addr == @github_event, E_INVALID_ACCOUNT);
         assert!(!account::exists_resource<Pool<CoinTypeA, CoinTypeB>>(@github_event), ERR_POOL_EXISTS);
         let pool = Pool<CoinTypeA, CoinTypeB>{
             coin_a_store: coin_store::create_coin_store<CoinTypeA>(),

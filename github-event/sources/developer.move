@@ -15,6 +15,8 @@ module github_event::developer {
     const E_REPO_NOT_EXIST : u64 = 2;
     const E_COMMIT_VERIFY_FAILED: u64 = 3;
     const E_HOOK_NOT_REPO_OWNER: u64 = 4;
+    const E_SENDER_NOT_REPO_OWNER: u64 = 5;
+    const E_HOOK_COMMIT_NOT_ALLOW: u64 = 6;   
 
     const EVENT_TYPE_COMMIT: u8 = 1;
     const EVENT_TYPE_MINT_DEVELOPER : u8 = 2;
@@ -107,7 +109,7 @@ module github_event::developer {
         let repos = account::borrow_mut_resource<Repos>(@github_event);
         assert!(table::contains(&repos.repos, repo_url), E_REPO_NOT_EXIST);
         let repo = table::borrow_mut(&mut repos.repos, repo_url);
-        assert!(repo.owner == signer::address_of(signer),E_HOOK_NOT_REPO_OWNER);
+        assert!(allow_commit(repo,signer),E_HOOK_COMMIT_NOT_ALLOW);
         table_vec::push_back(&mut repo.commits, Commit { commit_time,message,commit_url,commit_user,commit_address});
 
         if (rhec_coin::get_treasury_balance() > 0) {
@@ -120,6 +122,19 @@ module github_event::developer {
     entry fun update_pub(signer:&signer,signer_pub:vector<u8>){
         let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
         dev_info.signer_pub = signer_pub;
+    }
+
+    entry fun assign_repo(signer:&signer,repo_url:String,to_address:address){
+        let account_address = signer::address_of(signer);
+        let repos = account::borrow_mut_resource<Repos>(@github_event);
+        let repo = table::borrow_mut(&mut repos.repos, repo_url);
+        assert!(repo.owner == account_address,E_SENDER_NOT_REPO_OWNER);
+        repo.owner = to_address;
+    }
+
+    fun allow_commit(repo: &Repo,signer:&signer):bool {
+        let account_address = signer::address_of(signer);
+        repo.owner == account_address || repo.owner == @github_event
     }
 
     // view
