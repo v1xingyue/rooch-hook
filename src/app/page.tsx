@@ -36,7 +36,7 @@ export default function Main() {
         <Typography>
           <p>Network: {network}</p>
           <p>Contract: {mypackage}</p>
-          <p>Rooch Address : {address?.genRoochAddress().toHexAddress()}</p>
+          <p>Curretn Rooch Address : {address?.genRoochAddress().toHexAddress()}</p>
         </Typography>
       </Paper>
       <div>
