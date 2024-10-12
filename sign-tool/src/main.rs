@@ -237,6 +237,7 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
+                    println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 } else {
                     debug!("sign as msg mode...");
@@ -247,6 +248,7 @@ fn main() -> anyhow::Result<()> {
                     if !config.main.address.is_empty() {
                         println!("Address: {}", config.main.address);
                     }
+                    println!("Hash: {}", hex::encode(hash));
                     println!("Signature: {}", hex::encode(signature.to_bytes()));
                 }
             }
