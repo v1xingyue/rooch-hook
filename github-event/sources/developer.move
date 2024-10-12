@@ -109,12 +109,13 @@ module github_event::developer {
         let repos = account::borrow_mut_resource<Repos>(@github_event);
         assert!(table::contains(&repos.repos, repo_url), E_REPO_NOT_EXIST);
         let repo = table::borrow_mut(&mut repos.repos, repo_url);
-        assert!(allow_commit(repo,signer),E_HOOK_COMMIT_NOT_ALLOW);
+        
+        assert!(allow_commit(repo.owner,signer::address_of(signer)),E_HOOK_COMMIT_NOT_ALLOW);
         table_vec::push_back(&mut repo.commits, Commit { commit_time,message,commit_url,commit_user,commit_address});
 
         if (rhec_coin::get_treasury_balance() > 0) {
             rhec_coin::mint_to(signer, 1000);
-            let dev_info = account::borrow_mut_resource<DeveloperInfo>(signer::address_of(signer));
+            let dev_info = account::borrow_mut_resource<DeveloperInfo>(commit_address);
             dev_info.last_active_time = timestamp::now_seconds();
         };
     }
@@ -132,9 +133,9 @@ module github_event::developer {
         repo.owner = to_address;
     }
 
-    fun allow_commit(repo: &Repo,signer:&signer):bool {
-        let account_address = signer::address_of(signer);
-        repo.owner == account_address || repo.owner == @github_event
+    // view
+    public fun allow_commit(repo_owner_address:address,sender_address:address):bool {
+        repo_owner_address == sender_address || sender_address == @github_event
     }
 
     // view
